@@ -100,9 +100,7 @@ public class HomeDrawableActivity extends AppCompatActivity
         } else if (id == R.id.nav_share) {
 
         } else if (id == R.id.sign_out_menu) {
-
             FirebaseAuth.getInstance().signOut();
-
             Intent loginIntent=new Intent(HomeDrawableActivity.this,LoginActivity.class);
             startActivity(loginIntent);
             finish();
