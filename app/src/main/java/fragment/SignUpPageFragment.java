@@ -23,8 +23,10 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.hbb20.CountryCodePicker;
 import com.project.sagar.digishopper.EmailUtil;
 import com.project.sagar.digishopper.HomeDrawableActivity;
+import com.project.sagar.digishopper.LoginActivity;
 import com.project.sagar.digishopper.R;
 
 import javax.mail.Authenticator;
@@ -42,6 +44,7 @@ public class SignUpPageFragment extends Fragment {
     private EditText mobile_editText;
     private EditText pass_editText;
     private EditText confirm_editText;
+    private CountryCodePicker mCodePicker;
     private FirebaseAuth mAuth;
     @Nullable
     @Override
@@ -57,7 +60,7 @@ public class SignUpPageFragment extends Fragment {
         mobile_editText=v.findViewById(R.id.mobile_edittext);
         pass_editText=v.findViewById(R.id.pass_edittext);
         confirm_editText=v.findViewById(R.id.repass_edittext);
-
+        mCodePicker=v.findViewById(R.id.countryCodePicker);
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -69,7 +72,7 @@ public class SignUpPageFragment extends Fragment {
             @Override
             public void onClick(View v) {
 
-                new SendMail().execute();
+            //    new SendMail().execute();
 
                 boolean isValidate=true;
                 if(TextUtils.isEmpty(firstName_editText.getText()))
@@ -105,39 +108,60 @@ public class SignUpPageFragment extends Fragment {
                     final String pass=pass_editText.getText().toString();
 
 
+                    Bundle args = new Bundle();
+                    args.putString("fnameText", fname);
+                    args.putString("lnameText", lname);
+                    args.putString("countyCode", mCodePicker.getSelectedCountryCodeWithPlus());
+                    args.putString("emailText", email);
+                    args.putString("mobileText", mobile);
+                    args.putString("passText", pass);
+
+                    VerifyMobileFragment verifyMobileFragment=new VerifyMobileFragment();
+                    verifyMobileFragment.setArguments(args);
+                    getFragmentManager().beginTransaction()
+                            .replace(R.id.loginContainer,verifyMobileFragment,VerifyMobileFragment.TAG)
+                            .commit();
 
 
-                    mAuth.createUserWithEmailAndPassword(email,pass)
-                            .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                                @Override
-                                public void onComplete(@NonNull Task<AuthResult> task) {
-                                    if(task.isSuccessful())
-                                    {
-                                        FirebaseUser user = mAuth.getCurrentUser();
-                                        String uid=user.getUid();
-                                        DatabaseReference dbref=FirebaseDatabase.getInstance().getReference().child("Users").child(uid);
-
-                                        dbref.child("fistname").setValue(fname);
-                                        dbref.child("lastname").setValue(lname);
-                                        dbref.child("email").setValue(email);
-                                        dbref.child("mobile").setValue(mobile);
-                                        dbref.child("password").setValue(pass)
-                                                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                    @Override
-                                                    public void onComplete(@NonNull Task<Void> task) {
-                                                        //data set successfully
-
-                                                        Toast.makeText(getActivity(), "Account Created Successfully", Toast.LENGTH_SHORT).show();
-                                                        Intent loginIntent=new Intent(getActivity(), HomeDrawableActivity.class);
-                                                        startActivity(loginIntent);
-                                                        getActivity().finish();
-                                                    }
-                                                });
-                                    }else {
-                                        Toast.makeText(getActivity(), "Authentication Failed", Toast.LENGTH_SHORT).show();
-                                    }
-                                }
-                            });
+//                    mAuth.createUserWithEmailAndPassword(email,pass)
+//                            .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+//                                @Override
+//                                public void onComplete(@NonNull Task<AuthResult> task) {
+//                                    if(task.isSuccessful())
+//                                    {
+//                                        final FirebaseUser user = mAuth.getCurrentUser();
+//                                        String uid=user.getUid();
+//                                        DatabaseReference dbref=FirebaseDatabase.getInstance().getReference().child("Users").child(uid);
+//
+//                                        dbref.child("fistname").setValue(fname);
+//                                        dbref.child("lastname").setValue(lname);
+//                                        dbref.child("email").setValue(email);
+//                                        dbref.child("mobile").setValue(mobile);
+//                                        dbref.child("password").setValue(pass)
+//                                                .addOnCompleteListener(new OnCompleteListener<Void>() {
+//                                                    @Override
+//                                                    public void onComplete(@NonNull Task<Void> task) {
+//                                                        //data set successfully
+//                                                        user.sendEmailVerification().addOnCompleteListener(new OnCompleteListener<Void>() {
+//                                                            @Override
+//                                                            public void onComplete(@NonNull Task<Void> task) {
+//                                                                if(task.isSuccessful())
+//                                                                {
+//                                                                    Toast.makeText(getActivity(), "Account Created Successfully Verify your email to login", Toast.LENGTH_SHORT).show();
+//                                                                    Intent loginIntent=new Intent(getActivity(), LoginActivity.class);
+//                                                                    startActivity(loginIntent);
+//                                                                    getActivity().finish();
+//                                                                }
+//                                                            }
+//                                                        });
+//
+//                                                    }
+//                                                });
+//                                    }else {
+//                                        Toast.makeText(getActivity(), "Authentication Failed", Toast.LENGTH_SHORT).show();
+//                                    }
+//                                }
+//                            });
                 }else
                 {
                     //error handling
@@ -157,6 +181,7 @@ public class SignUpPageFragment extends Fragment {
         }
 
     }
+
 
 
     private class SendMail extends AsyncTask<String, Integer, Void> {
