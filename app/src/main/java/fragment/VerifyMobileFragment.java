@@ -1,5 +1,6 @@
 package fragment;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -81,6 +82,9 @@ public class VerifyMobileFragment extends Fragment {
     private Button mSignOutButton;
     private DatabaseReference userDatabasereference;
     ProgressBar progressBar;
+
+    private ProgressDialog progressDialog;
+
     String fname,lname,mobile,pass,email,countyCode;
 
 
@@ -97,6 +101,7 @@ public class VerifyMobileFragment extends Fragment {
         }
 
         progressBar = (ProgressBar) v.findViewById(R.id.progressBar);
+        progressDialog=new ProgressDialog(getActivity());
 
         // Assign views
         mPhoneNumberViews = (ViewGroup) v.findViewById(R.id.phone_auth_fields);
@@ -520,6 +525,7 @@ public class VerifyMobileFragment extends Fragment {
 
     private boolean validatePhoneNumber() {
         String phoneNumber =countyCode+mPhoneNumberField.getText().toString();
+        String s=phoneNumber;
         if (TextUtils.isEmpty(phoneNumber)) {
             mPhoneNumberField.setError("Invalid phone number.");
             //mPhoneNumberField.setTextColor(Color.parseColor("#ff1744"));

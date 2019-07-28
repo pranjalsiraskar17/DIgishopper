@@ -73,7 +73,6 @@ public class SignUpPageFragment extends Fragment {
             public void onClick(View v) {
 
             //    new SendMail().execute();
-
                 boolean isValidate=true;
                 if(TextUtils.isEmpty(firstName_editText.getText()))
                 {
@@ -184,43 +183,6 @@ public class SignUpPageFragment extends Fragment {
 
 
 
-    private class SendMail extends AsyncTask<String, Integer, Void> {
 
-        private ProgressDialog progressDialog;
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            progressDialog = ProgressDialog.show(getActivity(), "Please wait", "Sending mail", true, false);
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-            progressDialog.dismiss();
-        }
-
-        protected Void doInBackground(String... params) {
-
-            System.out.println("TLSEmail Start");
-            Properties props = new Properties();
-            props.put("mail.smtp.host", "smtp.gmail.com"); //SMTP Host
-            props.put("mail.smtp.port", "587"); //TLS Port
-            props.put("mail.smtp.auth", "true"); //enable authentication
-            props.put("mail.smtp.starttls.enable", "true"); //enable STARTTLS
-
-            //create Authenticator object to pass in Session.getInstance argument
-            Authenticator auth = new Authenticator() {
-                //override the getPasswordAuthentication method
-                protected PasswordAuthentication getPasswordAuthentication() {
-                    return new PasswordAuthentication("digishopperonline@gmail.com", "zgvmmbpiedgxtlta");
-                }
-            };
-            Session session = Session.getInstance(props, auth);
-
-            EmailUtil.sendEmail(session, "cyberclub149@gmail.com","TLSEmail Testing Subject", "TLSEmail Testing Body");
-            return null;
-        }
-    }
 
 }

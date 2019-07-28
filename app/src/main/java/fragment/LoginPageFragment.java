@@ -1,5 +1,6 @@
 package fragment;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -9,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -40,6 +42,7 @@ public class LoginPageFragment extends Fragment {
     private CountryCodePicker mCodePicker;
     private CheckBox cbx_Remember;
     private FirebaseAuth firebaseAuth;
+    private ProgressDialog progressDialog;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -52,9 +55,11 @@ public class LoginPageFragment extends Fragment {
         cbx_Remember=(CheckBox)v.findViewById(R.id.remember_cbx);
         mCodePicker=v.findViewById(R.id.codePicker);
         firebaseAuth=FirebaseAuth.getInstance();
+        progressDialog=new ProgressDialog(getActivity());
         btn_login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                progressDialog.show(getActivity(), "Log in...", "Please wait, we are fetching your credentials", true, false);
                 String mobile=editText_mobile.getText().toString();
                 final String password=editText_password.getText().toString();
                 boolean isValidate=true;
@@ -97,6 +102,7 @@ public class LoginPageFragment extends Fragment {
                                                 addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                                                     @Override
                                                     public void onComplete(@NonNull Task<AuthResult> task) {
+                                                        progressDialog.dismiss();
                                                         Toast.makeText(getActivity(), "Login Successful", Toast.LENGTH_SHORT).show();
                                                         Intent loginIntent=new Intent(getActivity(), HomeDrawableActivity.class);
                                                         startActivity(loginIntent);
