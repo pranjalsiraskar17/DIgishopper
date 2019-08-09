@@ -8,6 +8,7 @@ import com.google.android.material.snackbar.Snackbar;
 
 import android.view.View;
 
+import androidx.annotation.NonNull;
 import androidx.core.view.GravityCompat;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 
@@ -15,19 +16,34 @@ import android.view.MenuItem;
 
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.Menu;
+import android.widget.Toast;
 
+import java.util.ArrayList;
+
+import adapter.ProductAdapter;
 import fragment.LoginPageFragment;
 
 public class HomeDrawableActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
-
+    private RecyclerView product_recyclerView;
+    private DatabaseReference productRef;
+    private ProductAdapter adapter;
+    private ArrayList<AllProduct> productsList=new ArrayList<AllProduct>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,12 +52,39 @@ public class HomeDrawableActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
+        product_recyclerView=findViewById(R.id.recyclerview);
+
         NavigationView navigationView = findViewById(R.id.nav_view);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
         navigationView.setNavigationItemSelectedListener(this);
+        productRef= FirebaseDatabase.getInstance().getReference().child("ProductInfo");
+        Query query=productRef.orderByChild("productToAll").equalTo("true");
+
+        query.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                productsList.clear();
+                for (DataSnapshot dataSnapshot1:dataSnapshot.getChildren())
+                {
+                    AllProduct p=dataSnapshot1.getValue(AllProduct.class);
+                    productsList.add(p);
+                }
+                adapter=new ProductAdapter(HomeDrawableActivity.this,productsList);
+                product_recyclerView.setLayoutManager(new LinearLayoutManager(HomeDrawableActivity.this));
+                product_recyclerView.setAdapter(adapter);
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Toast.makeText(HomeDrawableActivity.this, databaseError.toString(), Toast.LENGTH_SHORT).show();
+
+            }
+        });
     }
 
     @Override
