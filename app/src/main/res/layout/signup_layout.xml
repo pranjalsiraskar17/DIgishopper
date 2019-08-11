@@ -33,7 +33,7 @@
               android:layout_height="35dp"
               android:layout_weight="9"
               android:background="@drawable/shapeemail"
-              android:hint="firstname"
+              android:hint="first"
               android:textColor="@color/white"
               android:textColorHint="@color/white"
               android:textColorHighlight="@color/white"/>
