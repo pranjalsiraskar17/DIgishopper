@@ -1,14 +1,22 @@
 package com.project.sagar.digishopper;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
+import android.text.TextUtils;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.view.View;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.view.GravityCompat;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 
@@ -16,24 +24,32 @@ import android.view.MenuItem;
 
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
-
+import com.squareup.picasso.Picasso;
 import androidx.drawerlayout.widget.DrawerLayout;
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.Menu;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.ImageView;
 import android.widget.Toast;
+import android.widget.ViewFlipper;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import adapter.ProductAdapter;
 import fragment.LoginPageFragment;
@@ -43,6 +59,10 @@ public class HomeDrawableActivity extends AppCompatActivity
     private RecyclerView product_recyclerView;
     private DatabaseReference productRef;
     private ProductAdapter adapter;
+    private ViewFlipper flipper;
+    private float startX;
+    private float startY;
+    private int CLICK_ACTION_THRESHOLD = 200;
     private ArrayList<AllProduct> productsList=new ArrayList<AllProduct>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +70,91 @@ public class HomeDrawableActivity extends AppCompatActivity
         setContentView(R.layout.activity_home_drawable);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        final ArrayList<String> imageList=new ArrayList<>();
+//        DatabaseReference flipperRef=FirebaseDatabase.getInstance().getReference().child("FlipperData").child("Flipper1");
+//        Query quer=flipperRef.orderByChild("isShow").equalTo("true");
+//        flipperRef.addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//
+//
+//                    if(dataSnapshot.child("image_url").getValue()!=null)
+//                    {
+//                        String imageUrl=dataSnapshot.child("image_url").getValue().toString();
+//                        imageList.add(imageUrl);
+//                    }
+//
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError databaseError) {
+//
+//            }
+//        });
+        imageList.add("https://image.shutterstock.com/image-vector/isometric-users-buying-online-tablets-260nw-1154447980.jpg");
+        imageList.add("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcREBV9TIH6ri4eqvG5jloZirQBOZop7KQ4b-tmMOyB43DTzE58m");
+        imageList.add("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ547F5phL6-3-Rd4JHXOzz5VKt6csQAiTPQKr39cj6rdglMQ91");
+        imageList.add("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR31LIrJBmaN8D3lftG_pplvE-ItXBy46zhkQ2Q-y1jfVn0PcOR");
+        flipper=findViewById(R.id.mainFlipper);
+//        flipper.setInAnimation(this,android.R.anim.slide_in_left);
+//        flipper.setOutAnimation(this,android.R.anim.slide_out_right);
+        flipper.setFlipInterval(2500);
+        flipper.setAutoStart(true);
+
+        Animation imgAnimationIn = AnimationUtils.
+                loadAnimation(this, android.R.anim.slide_in_left);
+        imgAnimationIn.setDuration(700);
+        flipper.setInAnimation(imgAnimationIn);
+
+        Animation imgAnimationOut = AnimationUtils.
+                loadAnimation(this, android.R.anim.slide_out_right);
+        imgAnimationOut.setDuration(700);
+        flipper.setOutAnimation(imgAnimationOut);
+
+//        flipper.setOnTouchListener(new View.OnTouchListener() {
+//            @Override
+//            public boolean onTouch(View view, MotionEvent event) {
+//                int action = event.getActionMasked();
+//
+//                switch (action) {
+//                    case MotionEvent.ACTION_DOWN:
+//                        startX = event.getX();
+//                        startY = event.getY();
+//                        break;
+//                    case MotionEvent.ACTION_UP:
+//                        float endX = event.getX();
+//                        float endY = event.getY();
+//
+////                        if (isAClick(startX, endX, startY, endY)) {
+////
+////                            Toast.makeText(HomeDrawableActivity.this, " n", Toast.LENGTH_SHORT).show();
+////                        }
+//
+//                        //swipe right
+//                        if (startX < endX) {
+//                            HomeDrawableActivity.this.flipper.showNext();
+//                        }
+//
+//                        //swipe left
+//                        if (startX > endX) {
+//                            HomeDrawableActivity.this.flipper.showPrevious();
+//                        }
+//
+//                        break;
+//
+//                }
+//                return true;
+//            }
+//        });
+
+        for(int i=0;i<imageList.size();i++)
+        {
+                flipImage(imageList.get(i));
+        }
+
+
+
+
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         product_recyclerView=findViewById(R.id.recyclerview);
@@ -61,7 +166,7 @@ public class HomeDrawableActivity extends AppCompatActivity
         toggle.syncState();
         navigationView.setNavigationItemSelectedListener(this);
         productRef= FirebaseDatabase.getInstance().getReference().child("ProductInfo");
-        Query query=productRef.orderByChild("productToAll").equalTo("true");
+        Query query=productRef.orderByChild("productToAll").equalTo(true);
 
         query.addValueEventListener(new ValueEventListener() {
             @Override
@@ -148,4 +253,55 @@ public class HomeDrawableActivity extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
+    private void flipImage(final String image_url){
+        ImageView view=new ImageView(this);
+        Picasso.with(this).load(image_url).into(view);
+        flipper.addView(view);
+
+        view.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent event) {
+                int action = event.getActionMasked();
+
+                switch (action) {
+                    case MotionEvent.ACTION_DOWN:
+                        startX = event.getX();
+                        startY = event.getY();
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        float endX = event.getX();
+                        float endY = event.getY();
+
+                        if (isAClick(startX, endX, startY, endY)) {
+
+                            Toast.makeText(HomeDrawableActivity.this, image_url, Toast.LENGTH_SHORT).show();
+                        }
+
+                        //swipe right
+                        if (startX < endX) {
+                            HomeDrawableActivity.this.flipper.showNext();
+                        }
+
+                        //swipe left
+                        if (startX > endX) {
+                            HomeDrawableActivity.this.flipper.showPrevious();
+                        }
+
+                        break;
+
+                }
+                return true;
+            }
+        });
+
+
+
+    }
+
+    private boolean isAClick(float startX, float endX, float startY, float endY) {
+        float differenceX = Math.abs(startX - endX);
+        float differenceY = Math.abs(startY - endY);
+        return !(differenceX > CLICK_ACTION_THRESHOLD/* =5 */ || differenceY > CLICK_ACTION_THRESHOLD);
+    }
+
 }

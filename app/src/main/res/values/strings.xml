@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">DigiShopper</string>
-    <string name="title_activity_home_drawable">HomeDrawableActivity</string>
+    <string name="title_activity_home_drawable">DigiShopper</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="nav_header_title">Android Studio</string>
@@ -85,4 +85,6 @@
 
     <string name="firebaseui_status_fmt">Firebase User: %s</string>
     <string name="firebaseui_title_text">FirebaseUI Auth</string>
+
+    <string name="Rs">\u20B9</string>
 </resources>

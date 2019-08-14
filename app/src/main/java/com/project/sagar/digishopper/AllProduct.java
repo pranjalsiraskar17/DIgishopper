@@ -1,17 +1,17 @@
 package com.project.sagar.digishopper;
 
 public class AllProduct {
-    String productToAll;
     String product_base_price;
+    String product_selling_price;
     String product_category;
     String product_desc;
     String product_id;
     String product_image;
     String product_name;
 
-    public AllProduct(String productToAll, String product_base_price, String product_category, String product_desc, String product_id, String product_image, String product_name) {
-        this.productToAll = productToAll;
+    public AllProduct(String product_base_price, String product_selling_price, String product_category, String product_desc, String product_id, String product_image, String product_name) {
         this.product_base_price = product_base_price;
+        this.product_selling_price = product_selling_price;
         this.product_category = product_category;
         this.product_desc = product_desc;
         this.product_id = product_id;
@@ -21,12 +21,13 @@ public class AllProduct {
 
     public AllProduct(){}
 
-    public String getProductToAll() {
-        return productToAll;
+
+    public String getProduct_selling_price() {
+        return product_selling_price;
     }
 
-    public void setProductToAll(String productToAll) {
-        this.productToAll = productToAll;
+    public void setProduct_selling_price(String product_selling_price) {
+        this.product_selling_price = product_selling_price;
     }
 
     public String getProduct_base_price() {

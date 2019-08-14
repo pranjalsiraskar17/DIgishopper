@@ -7,10 +7,21 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context=".HomeDrawableActivity"
     tools:showIn="@layout/app_bar_home_drawable">
+    <ViewFlipper
+        android:layout_margin="10dp"
+        android:id="@+id/mainFlipper"
+        android:layout_width="match_parent"
+        android:layout_height="200dp">
+    </ViewFlipper>
 
 <androidx.recyclerview.widget.RecyclerView
     android:id="@+id/recyclerview"
+    android:layout_below="@+id/mainFlipper"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 </androidx.recyclerview.widget.RecyclerView>
+    <FrameLayout
+        android:id="@+id/productHomeContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"></FrameLayout>
 </RelativeLayout>
