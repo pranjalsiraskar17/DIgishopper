@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "632095719943",
+    "firebase_url": "https://digishopper-eda6c.firebaseio.com",
+    "project_id": "digishopper-eda6c",
+    "storage_bucket": "digishopper-eda6c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:632095719943:android:540e01e7d9f30607",
+        "android_client_info": {
+          "package_name": "com.project.sagar.digishopper"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "632095719943-ef9hgl4kfsbl3omelhhl90vq3d5ju2jb.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.project.sagar.digishopper",
+            "certificate_hash": "afca5305b2d89514abcb08b6fe3f48df326d8dfa"
+          }
+        },
+        {
+          "client_id": "632095719943-jg27j5uoamvn41fde69b07lja1qernqi.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBgcujY8nyfW99esY2TIc2uy2vcye-gLq8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "632095719943-jg27j5uoamvn41fde69b07lja1qernqi.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

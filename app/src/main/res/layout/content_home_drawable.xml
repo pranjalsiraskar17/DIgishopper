@@ -7,6 +7,14 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context=".HomeDrawableActivity"
     tools:showIn="@layout/app_bar_home_drawable">
+
+    <SearchView
+        android:layout_margin="5dp"
+        android:layout_width="match_parent"
+        android:background="@drawable/labelstyle"
+        android:layout_height="wrap_content">
+
+    </SearchView>
     <ViewFlipper
         android:layout_margin="10dp"
         android:id="@+id/mainFlipper"

@@ -24,6 +24,7 @@ import android.view.MenuItem;
 
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -31,6 +32,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.squareup.picasso.Picasso;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.AppCompatActivity;
@@ -51,8 +53,17 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import Notification.APIService;
+import Notification.Client;
+import Notification.Data;
+import Notification.MyResponce;
+import Notification.Sender;
+import Notification.Token;
 import adapter.ProductAdapter;
 import fragment.LoginPageFragment;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class HomeDrawableActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -64,6 +75,8 @@ public class HomeDrawableActivity extends AppCompatActivity
     private float startY;
     private int CLICK_ACTION_THRESHOLD = 200;
     private ArrayList<AllProduct> productsList=new ArrayList<AllProduct>();
+    APIService apiService;
+    FirebaseUser user;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,6 +84,7 @@ public class HomeDrawableActivity extends AppCompatActivity
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         final ArrayList<String> imageList=new ArrayList<>();
+        user=FirebaseAuth.getInstance().getCurrentUser();
 //        DatabaseReference flipperRef=FirebaseDatabase.getInstance().getReference().child("FlipperData").child("Flipper1");
 //        Query quer=flipperRef.orderByChild("isShow").equalTo("true");
 //        flipperRef.addValueEventListener(new ValueEventListener() {
@@ -111,41 +125,7 @@ public class HomeDrawableActivity extends AppCompatActivity
         imgAnimationOut.setDuration(700);
         flipper.setOutAnimation(imgAnimationOut);
 
-//        flipper.setOnTouchListener(new View.OnTouchListener() {
-//            @Override
-//            public boolean onTouch(View view, MotionEvent event) {
-//                int action = event.getActionMasked();
-//
-//                switch (action) {
-//                    case MotionEvent.ACTION_DOWN:
-//                        startX = event.getX();
-//                        startY = event.getY();
-//                        break;
-//                    case MotionEvent.ACTION_UP:
-//                        float endX = event.getX();
-//                        float endY = event.getY();
-//
-////                        if (isAClick(startX, endX, startY, endY)) {
-////
-////                            Toast.makeText(HomeDrawableActivity.this, " n", Toast.LENGTH_SHORT).show();
-////                        }
-//
-//                        //swipe right
-//                        if (startX < endX) {
-//                            HomeDrawableActivity.this.flipper.showNext();
-//                        }
-//
-//                        //swipe left
-//                        if (startX > endX) {
-//                            HomeDrawableActivity.this.flipper.showPrevious();
-//                        }
-//
-//                        break;
-//
-//                }
-//                return true;
-//            }
-//        });
+
 
         for(int i=0;i<imageList.size();i++)
         {
@@ -155,7 +135,7 @@ public class HomeDrawableActivity extends AppCompatActivity
 
 
 
-
+        apiService = Client.getClient("https://fcm.googlepis.com/").create(APIService.class);
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         product_recyclerView=findViewById(R.id.recyclerview);
 
@@ -190,6 +170,8 @@ public class HomeDrawableActivity extends AppCompatActivity
 
             }
         });
+
+        updateToken(FirebaseInstanceId.getInstance().getToken());
     }
 
     @Override
@@ -233,6 +215,7 @@ public class HomeDrawableActivity extends AppCompatActivity
         if (id == R.id.nav_home) {
             // Handle the camera action
         } else if (id == R.id.nav_gallery) {
+            sendNotification(user.getUid(),"","");
 
         } else if (id == R.id.nav_slideshow) {
 
@@ -304,4 +287,46 @@ public class HomeDrawableActivity extends AppCompatActivity
         return !(differenceX > CLICK_ACTION_THRESHOLD/* =5 */ || differenceY > CLICK_ACTION_THRESHOLD);
     }
 
+    private void updateToken(String refreshToken){
+        FirebaseUser firebaseUser=FirebaseAuth.getInstance().getCurrentUser();
+        DatabaseReference reference= FirebaseDatabase.getInstance().getReference("Tokens");
+        Token token=new Token(refreshToken);
+        reference.child(firebaseUser.getUid()).setValue(token);
+    }
+
+    private void sendNotification(String receiver,String username,String message)
+    {
+        DatabaseReference tokens=FirebaseDatabase.getInstance().getReference("Tokens");
+        Query query=tokens.orderByKey().equalTo(receiver);
+        query.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for(DataSnapshot snapshot:dataSnapshot.getChildren()){
+                    Token token=snapshot.getValue(Token.class);
+                    Data data=new Data(FirebaseAuth.getInstance().getCurrentUser().getUid(),R.mipmap.ic_launcher,"msg","title",FirebaseAuth.getInstance().getCurrentUser().getUid());
+                    Sender sender=new Sender(data,token.getToken());
+                    apiService.sendNotification(sender)
+                            .enqueue(new Callback<MyResponce>() {
+                                @Override
+                                public void onResponse(Call<MyResponce> call, Response<MyResponce> response) {
+                                    if(response.body().success !=1){
+                                        Toast.makeText(HomeDrawableActivity.this, "failed", Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+
+                                @Override
+                                public void onFailure(Call<MyResponce> call, Throwable t) {
+
+                                }
+                            });
+
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
 }

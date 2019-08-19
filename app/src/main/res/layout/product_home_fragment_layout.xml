@@ -34,7 +34,7 @@
         android:layout_below="@+id/linear"
         android:layout_marginLeft="15dp"
         android:layout_marginRight="15dp"
-        android:background="#7c954a"
+        android:background="@color/linear_background"
         android:orientation="vertical">
 
         <ImageView
@@ -127,8 +127,8 @@
                 android:id="@+id/textView11"
                 android:layout_width="240dp"
                 android:layout_height="30dp"
-                android:background="@color/colorAccent"
                 android:text="Description"
+                android:background="@drawable/labelstyle"
                 android:gravity="center"
                 android:textColor="@color/white"
                 android:textSize="17dp"
@@ -152,7 +152,7 @@
         android:id="@+id/button_buy"
         android:layout_width="300dp"
         android:textColor="@color/white"
-        android:background="@color/colorAccent"
+        android:background="@drawable/labelstyle"
         android:layout_height="40dp"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
