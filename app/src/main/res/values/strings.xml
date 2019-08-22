@@ -87,4 +87,7 @@
     <string name="firebaseui_title_text">FirebaseUI Auth</string>
 
     <string name="Rs">\u20B9</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
