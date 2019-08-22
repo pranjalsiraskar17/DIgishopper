@@ -509,7 +509,7 @@ public class VerifyMobileFragment extends Fragment {
                                         FirebaseAuth.getInstance().getCurrentUser().sendEmailVerification().addOnCompleteListener(new OnCompleteListener<Void>() {
                                             @Override
                                             public void onComplete(@NonNull Task<Void> task) {
-                                                Toast.makeText(getActivity(), "Verification Email Sent on "+email+" please Verify your email to login", Toast.LENGTH_SHORT).show();
+                                             //   Toast.makeText(getActivity(), "Verification Email Sent on "+email+" please Verify your email to login", Toast.LENGTH_SHORT).show();
                                             }
                                         });
 
