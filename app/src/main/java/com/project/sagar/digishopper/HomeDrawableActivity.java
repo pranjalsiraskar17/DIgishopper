@@ -71,6 +71,7 @@ import Notification.Token;
 import adapter.OfferListAdapter;
 import adapter.ProductAdapter;
 import fragment.LoginPageFragment;
+import fragment.MapFragment;
 import fragment.ProductHomePageFragment;
 import fragment.SearchProductFragment;
 import retrofit2.Call;
@@ -371,6 +372,15 @@ public class HomeDrawableActivity extends AppCompatActivity
 
             }
         });
+    }
+
+    public void showMapFragment()
+    {
+        MapFragment mapFragment=new MapFragment();
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.productHomeContainer,mapFragment,mapFragment.TAG)
+                .addToBackStack(null)
+                .commit();
     }
 
 }
