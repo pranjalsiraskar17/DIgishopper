@@ -3,6 +3,7 @@ package com.project.sagar.digishopper;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Paint;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -12,6 +13,8 @@ import com.google.android.material.snackbar.Snackbar;
 
 import android.text.TextUtils;
 import android.view.GestureDetector;
+import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -43,7 +46,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.Menu;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.view.inputmethod.EditorInfo;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.SearchView;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
 
@@ -59,8 +68,11 @@ import Notification.Data;
 import Notification.MyResponce;
 import Notification.Sender;
 import Notification.Token;
+import adapter.OfferListAdapter;
 import adapter.ProductAdapter;
 import fragment.LoginPageFragment;
+import fragment.ProductHomePageFragment;
+import fragment.SearchProductFragment;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -75,8 +87,10 @@ public class HomeDrawableActivity extends AppCompatActivity
     private float startY;
     private int CLICK_ACTION_THRESHOLD = 200;
     private ArrayList<AllProduct> productsList=new ArrayList<AllProduct>();
+    private TextView username;
     APIService apiService;
     FirebaseUser user;
+    EditText productSearchBar;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -85,33 +99,27 @@ public class HomeDrawableActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
         final ArrayList<String> imageList=new ArrayList<>();
         user=FirebaseAuth.getInstance().getCurrentUser();
-//        DatabaseReference flipperRef=FirebaseDatabase.getInstance().getReference().child("FlipperData").child("Flipper1");
-//        Query quer=flipperRef.orderByChild("isShow").equalTo("true");
-//        flipperRef.addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//
-//
-//                    if(dataSnapshot.child("image_url").getValue()!=null)
-//                    {
-//                        String imageUrl=dataSnapshot.child("image_url").getValue().toString();
-//                        imageList.add(imageUrl);
-//                    }
-//
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError databaseError) {
-//
-//            }
-//        });
+        DatabaseReference dbruser=FirebaseDatabase.getInstance().getReference().child("Users").child(user.getUid());
+        dbruser.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                username=findViewById(R.id.txtusername);
+                String fname=dataSnapshot.child("user_fname").getValue().toString();
+                String lname=dataSnapshot.child("user_lname").getValue().toString();
+                username.setText(fname+" "+lname);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
         imageList.add("https://image.shutterstock.com/image-vector/isometric-users-buying-online-tablets-260nw-1154447980.jpg");
         imageList.add("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcREBV9TIH6ri4eqvG5jloZirQBOZop7KQ4b-tmMOyB43DTzE58m");
         imageList.add("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ547F5phL6-3-Rd4JHXOzz5VKt6csQAiTPQKr39cj6rdglMQ91");
         imageList.add("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR31LIrJBmaN8D3lftG_pplvE-ItXBy46zhkQ2Q-y1jfVn0PcOR");
         flipper=findViewById(R.id.mainFlipper);
-//        flipper.setInAnimation(this,android.R.anim.slide_in_left);
-//        flipper.setOutAnimation(this,android.R.anim.slide_out_right);
         flipper.setFlipInterval(2500);
         flipper.setAutoStart(true);
 
@@ -132,12 +140,49 @@ public class HomeDrawableActivity extends AppCompatActivity
                 flipImage(imageList.get(i));
         }
 
-
-
-
         apiService = Client.getClient("https://fcm.googlepis.com/").create(APIService.class);
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
-        product_recyclerView=findViewById(R.id.recyclerview);
+        product_recyclerView=findViewById(R.id.recyclerView);
+        productSearchBar=(EditText) findViewById(R.id.searchView);
+        productSearchBar.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                    SearchProductFragment searchProductFragment=new SearchProductFragment();
+                    Bundle bundle=new Bundle();
+                    bundle.putString("prdquery",productSearchBar.getText().toString());
+                    searchProductFragment.setArguments(bundle);
+                    getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.productHomeContainer,searchProductFragment,searchProductFragment.TAG)
+                            .addToBackStack(null)
+                            .commit();
+                    return true;
+                }
+                return false;
+            }
+        });
+
+//        searchViewproductSearchBar.setOnQueryTextListener(new SearchView.OnQueryTextListener(){
+//
+//            @Override
+//            public boolean onQueryTextSubmit(String query) {
+//                SearchProductFragment searchProductFragment=new SearchProductFragment();
+//                Bundle bundle=new Bundle();
+//                bundle.putString("prdquery",query);
+//                searchProductFragment.setArguments(bundle);
+//                getSupportFragmentManager().beginTransaction()
+//                        .replace(R.id.productHomeContainer,searchProductFragment,searchProductFragment.TAG)
+//                        .addToBackStack(null)
+//                        .commit();
+//                return false;
+//            }
+//
+//            @Override
+//            public boolean onQueryTextChange(String s) {
+//                return false;
+//            }
+//        });
+
 
         NavigationView navigationView = findViewById(R.id.nav_view);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -212,16 +257,16 @@ public class HomeDrawableActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_home) {
+        if (id == R.id.nav_myorder) {
             // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
+        } else if (id == R.id.nav_mynotification) {
             sendNotification(user.getUid(),"","");
 
-        } else if (id == R.id.nav_slideshow) {
+        } else if (id == R.id.nav_mywishlist) {
 
-        } else if (id == R.id.nav_tools) {
+        } else if (id == R.id.nav_myaccount) {
 
-        } else if (id == R.id.nav_share) {
+        } else if (id == R.id.nav_setting) {
 
         } else if (id == R.id.sign_out_menu) {
 
@@ -329,4 +374,5 @@ public class HomeDrawableActivity extends AppCompatActivity
             }
         });
     }
+
 }

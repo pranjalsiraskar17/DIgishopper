@@ -1,11 +1,13 @@
 package Notification;
 
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.Build;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
@@ -24,7 +26,11 @@ public class MyFirebaseIdService extends FirebaseMessagingService {
     public void onNewToken(@NonNull String s) {
         super.onNewToken(s);
         String refreshToken=s;
-        updateToken(refreshToken);
+        if(FirebaseAuth.getInstance().getCurrentUser()!=null)
+        {
+            updateToken(refreshToken);
+        }
+
     }
 
     @Override
@@ -34,8 +40,37 @@ public class MyFirebaseIdService extends FirebaseMessagingService {
         FirebaseUser firebaseUser=FirebaseAuth.getInstance().getCurrentUser();
         if(firebaseUser !=null && sented.equals(firebaseUser.getUid()))
         {
-            sendNotification(remoteMessage);
+            if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.O){
+                sendNewNotification(remoteMessage);
+            }else
+            {
+                sendNotification(remoteMessage);
+            }
+
         }
+    }
+
+    private void sendNewNotification(RemoteMessage remoteMessage) {
+        String user=remoteMessage.getData().get("user");
+        String icon=remoteMessage.getData().get("icon");
+        String title=remoteMessage.getData().get("title");
+        String body=remoteMessage.getData().get("body");
+
+        RemoteMessage.Notification notification=remoteMessage.getNotification();
+        int j=Integer.parseInt(user.replaceAll("[\\D]]",""));
+        // Intent =new Intent(this,)
+
+        //PendingIntent pendingIntent=PendingIntent.getActivity(this,j,)
+        Uri defaultSound= RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+
+        NewNotification newNotification=new NewNotification(this);
+        Notification.Builder builder=newNotification.getNewNotification(title,body,defaultSound,icon);
+        int i=0;
+        if(j>0)
+        {
+            i=j;
+        }
+        newNotification.getManager().notify(i,builder.build());
     }
 
     private void sendNotification(RemoteMessage remoteMessage) {
