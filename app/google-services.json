@@ -1,45 +1,21 @@
 {
   "project_info": {
-    "project_number": "632095719943",
-    "firebase_url": "https://digishopper-eda6c.firebaseio.com",
-    "project_id": "digishopper-eda6c",
-    "storage_bucket": "digishopper-eda6c.appspot.com"
+    "project_number": "321191637311",
+    "firebase_url": "https://digishopper-13f95.firebaseio.com",
+    "project_id": "digishopper-13f95",
+    "storage_bucket": "digishopper-13f95.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:632095719943:android:540e01e7d9f30607",
+        "mobilesdk_app_id": "1:321191637311:android:540e01e7d9f30607",
         "android_client_info": {
           "package_name": "com.project.sagar.digishopper"
         }
       },
       "oauth_client": [
         {
-          "client_id": "632095719943-7stjkg6phjlotiql0oqltlme0h9fgske.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.project.sagar.digishopper",
-            "certificate_hash": "980c66c1b7c6a9fd6c5b79c3f03e6f72fd5c48d5"
-          }
-        },
-        {
-          "client_id": "632095719943-b1mtt3ljv08n2q7iv3a83dm7f6c7dof1.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.project.sagar.digishopper",
-            "certificate_hash": "c6c2ea963812f611d82ccceef9db5a0e9daf4b77"
-          }
-        },
-        {
-          "client_id": "632095719943-nbg6s2942d2rsprjq7uptdvrvb4btbcg.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.project.sagar.digishopper",
-            "certificate_hash": "51d25f402902b9b8e0fe9251f89ff18807ddefba"
-          }
-        },
-        {
-          "client_id": "632095719943-ef9hgl4kfsbl3omelhhl90vq3d5ju2jb.apps.googleusercontent.com",
+          "client_id": "321191637311-r449v4pso41pbqfjpup1ruqm0dd6dk1h.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.project.sagar.digishopper",
@@ -47,65 +23,20 @@
           }
         },
         {
-          "client_id": "632095719943-jg27j5uoamvn41fde69b07lja1qernqi.apps.googleusercontent.com",
+          "client_id": "321191637311-9rphjanbkbtfb3bq3dl8jehpcfvelmk0.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyBgcujY8nyfW99esY2TIc2uy2vcye-gLq8"
+          "current_key": "AIzaSyBoqF1fI0zdPmV5O6IcxPgCw7uZCjU4yL4"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "632095719943-jg27j5uoamvn41fde69b07lja1qernqi.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:632095719943:android:7effad3bdd370e20",
-        "android_client_info": {
-          "package_name": "com.project.sagar.merchantapp"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "632095719943-eu9j4tg756m5voqme5ppb9jcf87e4l27.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.project.sagar.merchantapp",
-            "certificate_hash": "69e243bc58a40128683b0873dead004f8e778a2b"
-          }
-        },
-        {
-          "client_id": "632095719943-o30kavuenqi9m1kp7akj7e7hnt2j7jj0.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.project.sagar.merchantapp",
-            "certificate_hash": "afca5305b2d89514abcb08b6fe3f48df326d8dfa"
-          }
-        },
-        {
-          "client_id": "632095719943-jg27j5uoamvn41fde69b07lja1qernqi.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyBgcujY8nyfW99esY2TIc2uy2vcye-gLq8"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "632095719943-jg27j5uoamvn41fde69b07lja1qernqi.apps.googleusercontent.com",
+              "client_id": "321191637311-9rphjanbkbtfb3bq3dl8jehpcfvelmk0.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
