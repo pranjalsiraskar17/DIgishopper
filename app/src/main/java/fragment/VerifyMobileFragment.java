@@ -22,6 +22,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.FirebaseException;
@@ -41,6 +42,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.hbb20.CountryCodePicker;
 import com.project.sagar.digishopper.HomeDrawableActivity;
+import com.project.sagar.digishopper.LoginActivity;
 import com.project.sagar.digishopper.R;
 
 import java.util.concurrent.TimeUnit;
@@ -452,10 +454,10 @@ public class VerifyMobileFragment extends Fragment {
             mDetailText.setText(getString(R.string.firebase_status_fmt, user.getUid()));
             */
 
-            final String userID = FirebaseAuth.getInstance().getCurrentUser().getUid();
+            final FirebaseUser userID = FirebaseAuth.getInstance().getCurrentUser();
             DatabaseReference database = FirebaseDatabase.getInstance().getReference();
 
-            database.child("Users").child(userID).addListenerForSingleValueEvent(new ValueEventListener() {
+            database.child("Users").child(userID.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     // This callback will fire even if the node doesn't exist, so now check for existence
@@ -468,6 +470,7 @@ public class VerifyMobileFragment extends Fragment {
                     } else
                     {
                         AuthCredential credential = EmailAuthProvider.getCredential(email, pass);
+
                         mAuth.getCurrentUser().linkWithCredential(credential)
                                 .addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
                                     @Override
@@ -488,7 +491,7 @@ public class VerifyMobileFragment extends Fragment {
                                 });
 
 
-                        userDatabasereference= FirebaseDatabase.getInstance().getReference().child("Users").child(userID);
+                        userDatabasereference= FirebaseDatabase.getInstance().getReference().child("Users").child(userID.getUid());
                         userDatabasereference.child("user_phone_number").setValue(countyCode+mPhoneNumberField.getText().toString());
                         userDatabasereference.child("user_fname").setValue(fname);
                         userDatabasereference.child("user_lname").setValue(lname);
@@ -500,10 +503,25 @@ public class VerifyMobileFragment extends Fragment {
                         userDatabasereference.child("user_pass").setValue(pass).addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
-                                Intent mainintent=new Intent(getActivity(), HomeDrawableActivity.class);
+                                FirebaseAuth.getInstance().signInWithEmailAndPassword(email,pass).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<AuthResult> task) {
+                                        FirebaseAuth.getInstance().getCurrentUser().sendEmailVerification().addOnCompleteListener(new OnCompleteListener<Void>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<Void> task) {
+                                             //   Toast.makeText(getActivity(), "Verification Email Sent on "+email+" please Verify your email to login", Toast.LENGTH_SHORT).show();
+                                            }
+                                        });
+
+                                    }
+                                });
+
+                                Intent mainintent=new Intent(getActivity(), LoginActivity.class);
                                 mainintent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                 startActivity(mainintent);
                                 getActivity().finish();
+                                FirebaseAuth.getInstance().signOut();
+
                             }
                         });
 

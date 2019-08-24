@@ -24,6 +24,16 @@
             android:name=".HomeDrawableActivity"
             android:label="@string/title_activity_home_drawable"
             android:theme="@style/AppTheme.NoActionBar" />
+
+        <service android:name="Notification.MyFirebaseIdService"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT"></action>
+                <action android:name="com.google.firebase.MESSAGING_EVENT"></action>
+            </intent-filter>
+        </service>
     </application>
+
 
 </manifest>
