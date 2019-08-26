@@ -69,7 +69,11 @@ public class ProductHomePageFragment extends Fragment {
                 @Override
                 public void onSuccess(Uri uri) {
                    // allDownloadUrl.add(uri.toString());
-                    flipImage(uri.toString());
+                    if(getActivity()!=null)
+                    {
+                        flipImage(uri.toString());
+                    }
+
                 }
             });
 
@@ -143,6 +147,7 @@ public class ProductHomePageFragment extends Fragment {
 
 
     private void flipImage(final String image_url){
+
         ImageView view=new ImageView(getActivity());
         Picasso.with(getActivity()).load(image_url).into(view);
         imageFlipper.addView(view);
