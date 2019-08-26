@@ -118,45 +118,11 @@ public class ProductHomePageFragment extends Fragment {
         buy_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                final DatabaseReference txtCounterRef=FirebaseDatabase.getInstance().getReference().child("txtCounter");
-//                txtCounterRef.addListenerForSingleValueEvent(new ValueEventListener() {
-//                            @Override
-//                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//                                final String userKey=FirebaseAuth.getInstance().getCurrentUser().getUid();
-//                                final int txnid=Integer.parseInt(dataSnapshot.getValue().toString())+1;
-//                                DatabaseReference txnRef=FirebaseDatabase.getInstance().getReference().child("Orders").child("TXN"+txnid);
-//                                txnRef.child("txn_id").setValue("TXN"+txnid);
-//                                txnRef.child("prd_id").setValue(prdid);
-//                                txnRef.child("order_status").setValue("ordered");
-//                                txnRef.child("txn_timestamp").setValue(ServerValue.TIMESTAMP);
-//                                txnRef.child("buyer_userkey").setValue(userKey)
-//                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-//                                            @Override
-//                                            public void onSuccess(Void aVoid) {
-//                                                txtCounterRef.setValue(txnid);
-//                                                DatabaseReference odersRef=FirebaseDatabase.getInstance().getReference().child("Users").child(userKey).child("Myorders").child("TXN"+txnid);
-//                                                odersRef.child("order_status").setValue("ordered");
-//                                                odersRef.child("txn_id").setValue("TXN"+txnid).addOnSuccessListener(new OnSuccessListener<Void>() {
-//                                                    @Override
-//                                                    public void onSuccess(Void aVoid) {
-//                                                        Toast.makeText(getActivity(), "Booking Done !", Toast.LENGTH_SHORT).show();
-//                                                    }
-//                                                });
-//                                            }
-//                                        });
-//
-//
-//                            }
-//
-//                            @Override
-//                            public void onCancelled(@NonNull DatabaseError databaseError) {
-//
-//                            }
-//                        });
 
 
 
-                ((HomeDrawableActivity)getActivity()).showMapFragment();
+
+                ((HomeDrawableActivity)getActivity()).showMapFragment(prdid);
 
             }
         });

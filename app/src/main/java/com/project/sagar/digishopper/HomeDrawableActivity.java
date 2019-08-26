@@ -40,6 +40,7 @@ import com.squareup.picasso.Picasso;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -72,6 +73,7 @@ import adapter.OfferListAdapter;
 import adapter.ProductAdapter;
 import fragment.LoginPageFragment;
 import fragment.MapFragment;
+import fragment.ProductBillFragment;
 import fragment.ProductHomePageFragment;
 import fragment.SearchProductFragment;
 import retrofit2.Call;
@@ -237,20 +239,8 @@ public class HomeDrawableActivity extends AppCompatActivity
         return true;
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
 
-        return super.onOptionsItemSelected(item);
-    }
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
@@ -374,13 +364,36 @@ public class HomeDrawableActivity extends AppCompatActivity
         });
     }
 
-    public void showMapFragment()
+    public void showMapFragment(String prdid)
     {
         MapFragment mapFragment=new MapFragment();
+        Bundle bundle=new Bundle();
+        bundle.putString("prdidToAddress",prdid);
+        mapFragment.setArguments(bundle);
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.productHomeContainer,mapFragment,mapFragment.TAG)
                 .addToBackStack(null)
                 .commit();
+    }
+    public void showProductBillFragment(String prdid,String address,String name,String mobile)
+    {
+        ProductBillFragment productBillFragment=new ProductBillFragment();
+        Bundle bundle=new Bundle();
+        bundle.putString("prdidToBookOrder",prdid);
+        bundle.putString("address",address);
+        bundle.putString("name",name);
+        bundle.putString("mobile",mobile);
+        productBillFragment.setArguments(bundle);
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.productHomeContainer,productBillFragment,productBillFragment.TAG)
+                .addToBackStack(null)
+                .commit();
+    }
+
+    public void removeAllFragment(){
+        for (Fragment fragment : getSupportFragmentManager().getFragments()) {
+            getSupportFragmentManager().beginTransaction().remove(fragment).commit();
+        }
     }
 
 }
