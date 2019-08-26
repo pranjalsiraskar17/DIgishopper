@@ -69,7 +69,6 @@ import Notification.Data;
 import Notification.MyResponce;
 import Notification.Sender;
 import Notification.Token;
-import adapter.OfferListAdapter;
 import adapter.ProductAdapter;
 import fragment.LoginPageFragment;
 import fragment.MapFragment;
