@@ -57,7 +57,6 @@ public class ProductHomePageFragment extends Fragment {
         imageFlipper=view.findViewById(R.id.imagesFlipper);
         offerLabel=view.findViewById(R.id.fragmentImgOffer);
         buy_button=view.findViewById(R.id.button_buy);
-
         Bundle bundle=getArguments();
         final String prdid=bundle.getString("productId");
         DatabaseReference productRef= FirebaseDatabase.getInstance().getReference().child("ProductInfo").child(prdid);
@@ -68,7 +67,6 @@ public class ProductHomePageFragment extends Fragment {
             productImagesRef.child(i+".png").getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                 @Override
                 public void onSuccess(Uri uri) {
-                   // allDownloadUrl.add(uri.toString());
                     if(getActivity()!=null)
                     {
                         flipImage(uri.toString());

@@ -164,26 +164,6 @@ public class HomeDrawableActivity extends AppCompatActivity
             }
         });
 
-//        searchViewproductSearchBar.setOnQueryTextListener(new SearchView.OnQueryTextListener(){
-//
-//            @Override
-//            public boolean onQueryTextSubmit(String query) {
-//                SearchProductFragment searchProductFragment=new SearchProductFragment();
-//                Bundle bundle=new Bundle();
-//                bundle.putString("prdquery",query);
-//                searchProductFragment.setArguments(bundle);
-//                getSupportFragmentManager().beginTransaction()
-//                        .replace(R.id.productHomeContainer,searchProductFragment,searchProductFragment.TAG)
-//                        .addToBackStack(null)
-//                        .commit();
-//                return false;
-//            }
-//
-//            @Override
-//            public boolean onQueryTextChange(String s) {
-//                return false;
-//            }
-//        });
 
 
         NavigationView navigationView = findViewById(R.id.nav_view);
