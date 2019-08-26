@@ -102,6 +102,7 @@ public class HomeDrawableActivity extends AppCompatActivity
         setContentView(R.layout.activity_home_drawable);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
         final ArrayList<String> imageList=new ArrayList<>();
         user=FirebaseAuth.getInstance().getCurrentUser();
         DatabaseReference dbruser=FirebaseDatabase.getInstance().getReference().child("Users").child(user.getUid());

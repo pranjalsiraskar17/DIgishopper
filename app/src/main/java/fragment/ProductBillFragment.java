@@ -27,6 +27,7 @@ public class ProductBillFragment extends Fragment {
     public static final String TAG=ProductBillFragment.class.getSimpleName();
     TextView basePrice,offerPrice,discountPrice,totalPrice,deliveryPrice;
     Button bookBtn;
+    private int txnid;
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -69,7 +70,7 @@ public class ProductBillFragment extends Fragment {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                 final String userKey= FirebaseAuth.getInstance().getCurrentUser().getUid();
-                                final int txnid=Integer.parseInt(dataSnapshot.getValue().toString())+1;
+                                txnid=Integer.parseInt(dataSnapshot.getValue().toString())+1;
                                 DatabaseReference txnRef=FirebaseDatabase.getInstance().getReference().child("Orders").child("TXN"+txnid);
                                 txnRef.child("txn_id").setValue("TXN"+txnid);
                                 txnRef.child("prd_id").setValue(prdid);
@@ -105,6 +106,26 @@ public class ProductBillFragment extends Fragment {
 
                             }
                         });
+
+                final DatabaseReference nftCounter=FirebaseDatabase.getInstance().getReference().child("nftCounter");
+                nftCounter.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        final String userKey= FirebaseAuth.getInstance().getCurrentUser().getUid();
+                        final int nftid=Integer.parseInt(dataSnapshot.getValue().toString())+1;
+                        DatabaseReference nftRef=FirebaseDatabase.getInstance().getReference().child("Notifications").child("Merchant").child("NFT"+nftid);
+                        nftRef.child("txn_id").setValue("TXN"+txnid);
+                        nftRef.child("prd_id").setValue(prdid);
+                        nftRef.child("order_type").setValue("ordered");
+                        nftRef.child("txn_timestamp").setValue(ServerValue.TIMESTAMP);
+                        nftRef.child("buyer_userkey").setValue(userKey);
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
             }
         });
 
