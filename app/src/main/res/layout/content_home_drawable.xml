@@ -49,10 +49,6 @@
     </androidx.recyclerview.widget.RecyclerView>
 
 
-
-
-
-
     <FrameLayout
         android:id="@+id/productHomeContainer"
         android:layout_width="match_parent"

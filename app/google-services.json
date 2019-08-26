@@ -15,6 +15,30 @@
       },
       "oauth_client": [
         {
+          "client_id": "632095719943-nbi5goqjcf2gf4juu18cvef6tv2nuh06.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.project.sagar.digishopper",
+            "certificate_hash": "69e243bc58a40128683b0873dead004f8e778a2b"
+          }
+        },
+        {
+          "client_id": "632095719943-7stjkg6phjlotiql0oqltlme0h9fgske.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.project.sagar.digishopper",
+            "certificate_hash": "980c66c1b7c6a9fd6c5b79c3f03e6f72fd5c48d5"
+          }
+        },
+        {
+          "client_id": "632095719943-b1mtt3ljv08n2q7iv3a83dm7f6c7dof1.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.project.sagar.digishopper",
+            "certificate_hash": "c6c2ea963812f611d82ccceef9db5a0e9daf4b77"
+          }
+        },
+        {
           "client_id": "632095719943-nbg6s2942d2rsprjq7uptdvrvb4btbcg.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
@@ -59,6 +83,14 @@
         }
       },
       "oauth_client": [
+        {
+          "client_id": "632095719943-eu9j4tg756m5voqme5ppb9jcf87e4l27.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.project.sagar.merchantapp",
+            "certificate_hash": "69e243bc58a40128683b0873dead004f8e778a2b"
+          }
+        },
         {
           "client_id": "632095719943-o30kavuenqi9m1kp7akj7e7hnt2j7jj0.apps.googleusercontent.com",
           "client_type": 1,
