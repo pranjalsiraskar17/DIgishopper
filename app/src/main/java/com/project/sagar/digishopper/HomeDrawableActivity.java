@@ -1,13 +1,25 @@
 package com.project.sagar.digishopper;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Paint;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
+
+import android.text.TextUtils;
+import android.view.GestureDetector;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.view.GravityCompat;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 
@@ -16,6 +28,7 @@ import android.view.MenuItem;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -27,6 +40,7 @@ import com.squareup.picasso.Picasso;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -36,11 +50,18 @@ import android.view.animation.AnimationUtils;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import Notification.APIService;
 import Notification.Client;
@@ -48,10 +69,14 @@ import Notification.Data;
 import Notification.MyResponce;
 import Notification.Sender;
 import Notification.Token;
+import adapter.OfferListAdapter;
 import adapter.ProductAdapter;
+import fragment.LoginPageFragment;
 import fragment.MapFragment;
 import fragment.MyAccountFragment;
 import fragment.MyOrderFragment;
+import fragment.ProductBillFragment;
+import fragment.ProductHomePageFragment;
 import fragment.SearchProductFragment;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -117,7 +142,7 @@ public class HomeDrawableActivity extends AppCompatActivity
 
         for(int i=0;i<imageList.size();i++)
         {
-                flipImage(imageList.get(i));
+            flipImage(imageList.get(i));
         }
 
         apiService = Client.getClient("https://fcm.googlepis.com/").create(APIService.class);
@@ -216,20 +241,8 @@ public class HomeDrawableActivity extends AppCompatActivity
         return true;
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
 
-        return super.onOptionsItemSelected(item);
-    }
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
@@ -238,6 +251,7 @@ public class HomeDrawableActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_myorder) {
+            // Handle the camera action
             MyOrderFragment myOrderFragment =new MyOrderFragment();
             Bundle bundle = new Bundle();
             bundle.putString("userid",user.getUid());
@@ -247,11 +261,9 @@ public class HomeDrawableActivity extends AppCompatActivity
                     .addToBackStack(null)
                     .commit();
 
-            // Handle the camera action
+
         } else if (id == R.id.nav_mynotification) {
             sendNotification(user.getUid(),"","");
-
-
 
         } else if (id == R.id.nav_mywishlist) {
 
@@ -370,13 +382,39 @@ public class HomeDrawableActivity extends AppCompatActivity
         });
     }
 
-    public void showMapFragment()
+    public void showMapFragment(String prdid)
     {
         MapFragment mapFragment=new MapFragment();
+        Bundle bundle=new Bundle();
+        bundle.putString("prdidToAddress",prdid);
+        mapFragment.setArguments(bundle);
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.productHomeContainer,mapFragment,mapFragment.TAG)
                 .addToBackStack(null)
                 .commit();
     }
+    public void showProductBillFragment(String prdid,String address,String name,String mobile)
+    {
+        ProductBillFragment productBillFragment=new ProductBillFragment();
+        Bundle bundle=new Bundle();
+        bundle.putString("prdidToBookOrder",prdid);
+        bundle.putString("address",address);
+        bundle.putString("name",name);
+        bundle.putString("mobile",mobile);
+        productBillFragment.setArguments(bundle);
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.productHomeContainer,productBillFragment,productBillFragment.TAG)
+                .addToBackStack(null)
+                .commit();
+    }
+
+    public void removeAllFragment(){
+        for (Fragment fragment : getSupportFragmentManager().getFragments()) {
+            getSupportFragmentManager().beginTransaction().remove(fragment).commit();
+        }
+    }
 
 }
+
+
+
