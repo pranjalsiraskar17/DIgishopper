@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -29,14 +30,18 @@ import adapter.ShoppingCartAdapter;
 public class ShoppingCartFragment extends Fragment {
     public static final String TAG=ShoppingCartFragment.class.getSimpleName();
     private RecyclerView recyclerView_cart;
+    public static TextView cart_amount_txt;
     private ArrayList<CartProduct> cartProducts =new ArrayList<>();
     private ShoppingCartAdapter adapter;
+    public static int cart_amt;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view=inflater.inflate(R.layout.shopping_cart_layout,container,false);
         recyclerView_cart=view.findViewById(R.id.cart_recyclerview);
+        cart_amount_txt=view.findViewById(R.id.cartamount_txt);
+
         DatabaseReference dbr= FirebaseDatabase.getInstance().getReference().child("Users").child(FirebaseAuth.getInstance().getCurrentUser().getUid())
                 .child("Mycart");
         dbr.addValueEventListener(new ValueEventListener() {
@@ -44,14 +49,18 @@ public class ShoppingCartFragment extends Fragment {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
                 cartProducts.clear();
+
                 for(DataSnapshot dataSnapshot1:dataSnapshot.getChildren())
                 {
                     CartProduct cp=dataSnapshot1.getValue(CartProduct.class);
                     cartProducts.add(cp);
+
                 }
                 adapter=new ShoppingCartAdapter(getActivity(),cartProducts);
+
                 recyclerView_cart.setLayoutManager(new LinearLayoutManager(getActivity()));
                 recyclerView_cart.setAdapter(adapter);
+
 
             }
 
@@ -60,6 +69,8 @@ public class ShoppingCartFragment extends Fragment {
 
             }
         });
+
+
 
 
         return view;

@@ -27,11 +27,14 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
+import fragment.ShoppingCartFragment;
+
 import static com.project.sagar.digishopper.LastSeenTime.getTimeAgo;
 
 public class ShoppingCartAdapter extends RecyclerView.Adapter<ShoppingCartAdapter.CartViewHolder> {
     private Context context;
     private ArrayList<CartProduct> cartProducts;
+    private int total;
 
     public ShoppingCartAdapter(Context context, ArrayList<CartProduct> cartProducts) {
         this.context = context;
@@ -78,6 +81,8 @@ public class ShoppingCartAdapter extends RecyclerView.Adapter<ShoppingCartAdapte
                 int selling=Integer.parseInt(dataSnapshot.child("product_selling_price").getValue().toString());
                 int base=Integer.parseInt(dataSnapshot.child("product_base_price").getValue().toString());
                 int save=base-selling;
+                total+=selling*cartProducts.get(position).getProduct_qty();
+                ShoppingCartFragment.cart_amount_txt.setText(context.getResources().getString(R.string.Rs)+total);
                 holder.textView_price.setText(context.getResources().getString(R.string.Rs)+selling);
                 if(save>0)
                 {
