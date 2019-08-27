@@ -5,6 +5,8 @@ import android.graphics.Paint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -25,6 +27,8 @@ import com.project.sagar.digishopper.CartProduct;
 import com.project.sagar.digishopper.R;
 import com.squareup.picasso.Picasso;
 
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
 
 import fragment.ShoppingCartFragment;
@@ -33,9 +37,9 @@ import static com.project.sagar.digishopper.LastSeenTime.getTimeAgo;
 
 public class ShoppingCartAdapter extends RecyclerView.Adapter<ShoppingCartAdapter.CartViewHolder> {
     private Context context;
+    private String uid;
     private ArrayList<CartProduct> cartProducts;
     private int total;
-
     public ShoppingCartAdapter(Context context, ArrayList<CartProduct> cartProducts) {
         this.context = context;
         this.cartProducts = cartProducts;
@@ -46,6 +50,7 @@ public class ShoppingCartAdapter extends RecyclerView.Adapter<ShoppingCartAdapte
     @Override
     public ShoppingCartAdapter.CartViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view= LayoutInflater.from(context).inflate(R.layout.cart_recyclerview_layout,parent,false);
+        uid=FirebaseAuth.getInstance().getCurrentUser().getUid();
         CartViewHolder holder=new CartViewHolder(view);
         return holder;
     }
@@ -73,6 +78,8 @@ public class ShoppingCartAdapter extends RecyclerView.Adapter<ShoppingCartAdapte
         dbr.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                final DatabaseReference dbr=FirebaseDatabase.getInstance().getReference().child("Users").child(uid)
+                        .child("Mycart").child(cartProducts.get(position).getProduct_id()).child("product_qty");
                 Picasso.with(context).load(dataSnapshot.child("product_image").getValue().toString()).into(holder.imageView_product);
                 holder.textView_name.setText(dataSnapshot.child("product_name").getValue().toString());
                 holder.textView_timestamp.setText(getTimeAgo(cartProducts.get(position).getTimestamp(),context));
@@ -89,6 +96,29 @@ public class ShoppingCartAdapter extends RecyclerView.Adapter<ShoppingCartAdapte
                     holder.textView_baseprice.setPaintFlags(holder.textView_baseprice.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
                     holder.textView_baseprice.setText(context.getResources().getString(R.string.Rs)+base);
                 }
+
+                holder.img_button_add.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        int no=Integer.parseInt( holder.textView_qty.getText().toString());
+                        dbr.setValue(no+1);
+                        notifyDataSetChanged();
+                    }
+                });
+
+                holder.img_button_rm.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                            int n=Integer.parseInt( holder.textView_qty.getText().toString());
+                            if(n>1)
+                            {
+                                dbr.setValue(n-1);
+                                notifyDataSetChanged();
+                            }
+
+
+                    }
+                });
             }
 
             @Override
@@ -96,6 +126,8 @@ public class ShoppingCartAdapter extends RecyclerView.Adapter<ShoppingCartAdapte
 
             }
         });
+
+
     }
 
     @Override
@@ -105,7 +137,9 @@ public class ShoppingCartAdapter extends RecyclerView.Adapter<ShoppingCartAdapte
 
     public class CartViewHolder extends RecyclerView.ViewHolder {
         private ImageView imageView_product,imageView_close;
-        private TextView textView_name,textView_timestamp,textView_qty,textView_price,textView_baseprice;
+        private TextView textView_name,textView_timestamp,textView_price,textView_baseprice;
+        private ImageView img_button_add,img_button_rm;
+        private TextView textView_qty;
         public CartViewHolder(@NonNull View itemView) {
             super(itemView);
             imageView_product=itemView.findViewById(R.id.imageView_product);
@@ -114,6 +148,8 @@ public class ShoppingCartAdapter extends RecyclerView.Adapter<ShoppingCartAdapte
             textView_price=itemView.findViewById(R.id.product_price_txt);
             textView_baseprice=itemView.findViewById(R.id.product_baseprice_txt);
             textView_qty=itemView.findViewById(R.id.product_qty_txt);
+            img_button_add=itemView.findViewById(R.id.img_button_add);
+            img_button_rm=itemView.findViewById(R.id.img_button_rm);
             textView_timestamp=itemView.findViewById(R.id.product_timstamp_txt);
 
 

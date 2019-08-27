@@ -374,22 +374,36 @@ public class HomeDrawableActivity extends AppCompatActivity
         });
     }
 
-    public void showMapFragment(String prdid)
+    public void showMapFragment(String prdid,int qty)
     {
         MapFragment mapFragment=new MapFragment();
         Bundle bundle=new Bundle();
         bundle.putString("prdidToAddress",prdid);
+        bundle.putString("parentFrag","prdhome");
+        bundle.putInt("qty",qty);
         mapFragment.setArguments(bundle);
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.productHomeContainer,mapFragment,mapFragment.TAG)
                 .addToBackStack(null)
                 .commit();
     }
-    public void showProductBillFragment(String prdid,String address,String name,String mobile)
+    public void showMapFragment(HashMap<String,ArrayList<String>> map)
+    {
+        MapFragment mapFragment=new MapFragment();
+        Bundle bundle=new Bundle();
+        bundle.putSerializable("cartmap",map);
+        bundle.putString("parentFrag","cart");
+        mapFragment.setArguments(bundle);
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.productHomeContainer,mapFragment,mapFragment.TAG)
+                .addToBackStack(null)
+                .commit();
+    }
+    public void showProductBillFragment(HashMap<String,ArrayList<String>> map,String address,String name,String mobile)
     {
         ProductBillFragment productBillFragment=new ProductBillFragment();
         Bundle bundle=new Bundle();
-        bundle.putString("prdidToBookOrder",prdid);
+        bundle.putSerializable("prdmap",map);
         bundle.putString("address",address);
         bundle.putString("name",name);
         bundle.putString("mobile",mobile);

@@ -133,7 +133,7 @@ public class ProductHomePageFragment extends Fragment {
 
 
 
-                ((HomeDrawableActivity)getActivity()).showMapFragment(prdid);
+                ((HomeDrawableActivity)getActivity()).showMapFragment(prdid,Integer.parseInt(editText_qty.getText().toString()));
 
             }
         });
