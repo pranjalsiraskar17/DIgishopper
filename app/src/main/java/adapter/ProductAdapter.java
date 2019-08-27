@@ -67,13 +67,14 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
         int selling=Integer.parseInt(products.get(position).getProduct_selling_price());
         int base=Integer.parseInt(products.get(position).getProduct_base_price());
         int save=base-selling;
-        holder.textView_ProductPrice.setText(context.getResources().getString(R.string.Rs)+String.valueOf(selling));
-        holder.textView_ProductBasePrice.setText(context.getResources().getString(R.string.Rs)+String.valueOf(base));
+        holder.textView_ProductPrice.setText(context.getResources().getString(R.string.Rs)+selling);
+
         if(save!=0)
         {
-            holder.textView_ProductBasePrice.setPaintFlags(holder.textView_ProductBasePrice.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
-            if(save>0)
+           if(save>0)
             {
+                holder.textView_ProductBasePrice.setText(context.getResources().getString(R.string.Rs)+base);
+                holder.textView_ProductBasePrice.setPaintFlags(holder.textView_ProductBasePrice.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
                 holder.textView_ProductsavePrice.setText("You will save "+context.getResources().getString(R.string.Rs)+save);
                 int offerPer=(save*100)/base;
                 if(offerPer>1)

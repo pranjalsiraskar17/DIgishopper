@@ -9,6 +9,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -18,8 +19,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -40,7 +43,8 @@ public class ProductHomePageFragment extends Fragment {
     public static final String TAG=ProductHomePageFragment.class.getSimpleName();
     private TextView textView_ProductName,textView_Desc,textView_ProductPrice,textView_ProductBasePrice,textView_ProductsavePrice,offerLabel;
     private ViewFlipper imageFlipper;
-    private Button buy_button;
+    private EditText editText_qty;
+    private Button buy_button,addcart_button;
     private float startX;
     private float startY;
     private int CLICK_ACTION_THRESHOLD = 200;
@@ -57,64 +61,69 @@ public class ProductHomePageFragment extends Fragment {
         imageFlipper=view.findViewById(R.id.imagesFlipper);
         offerLabel=view.findViewById(R.id.fragmentImgOffer);
         buy_button=view.findViewById(R.id.button_buy);
+        editText_qty=view.findViewById(R.id.qtyedittxt);
+        addcart_button=view.findViewById(R.id.button_addcart);
         Bundle bundle=getArguments();
         final String prdid=bundle.getString("productId");
-        DatabaseReference productRef= FirebaseDatabase.getInstance().getReference().child("ProductInfo").child(prdid);
-        StorageReference productImagesRef= FirebaseStorage.getInstance().getReference().child("ProductImages").child(prdid);
-        final ArrayList<String> allDownloadUrl=new ArrayList<>();
-        for(int i=1;i<5;i++)
+        if(prdid!=null)
         {
-            productImagesRef.child(i+".png").getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+            DatabaseReference productRef= FirebaseDatabase.getInstance().getReference().child("ProductInfo").child(prdid);
+            StorageReference productImagesRef= FirebaseStorage.getInstance().getReference().child("ProductImages").child(prdid);
+            for(int i=1;i<5;i++)
+            {
+                productImagesRef.child(i+".png").getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                    @Override
+                    public void onSuccess(Uri uri) {
+                        if(getActivity()!=null)
+                        {
+                            flipImage(uri.toString());
+                        }
+
+                    }
+                });
+
+            }
+
+            productRef.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
-                public void onSuccess(Uri uri) {
-                    if(getActivity()!=null)
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    textView_ProductName.setText(dataSnapshot.child("product_name").getValue().toString());
+                    int selling=Integer.parseInt(dataSnapshot.child("product_selling_price").getValue().toString());
+                    int base=Integer.parseInt(dataSnapshot.child("product_base_price").getValue().toString());
+                    int save=base-selling;
+                    textView_ProductPrice.setText(getResources().getString(R.string.Rs)+selling);
+                    textView_ProductBasePrice.setText(getResources().getString(R.string.Rs)+base);
+                    textView_ProductBasePrice.setPaintFlags(textView_ProductBasePrice.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+                    if(save>0)
                     {
-                        flipImage(uri.toString());
+                        textView_ProductsavePrice.setText("You will save "+getResources().getString(R.string.Rs)+save);
+                        int offerPer=(save*100)/base;
+                        if(offerPer>1)
+                        {
+                            offerLabel.setBackground(getActivity().getDrawable(R.drawable.ic_local_offer_black_24dp));
+                            offerLabel.setText(offerPer+"%\noff");
+                        }
                     }
 
-                }
-            });
-
-        }
-
-        productRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                textView_ProductName.setText(dataSnapshot.child("product_name").getValue().toString());
-                int selling=Integer.parseInt(dataSnapshot.child("product_selling_price").getValue().toString());
-                int base=Integer.parseInt(dataSnapshot.child("product_base_price").getValue().toString());
-                int save=base-selling;
-                textView_ProductPrice.setText(getResources().getString(R.string.Rs)+selling);
-                textView_ProductBasePrice.setText(getResources().getString(R.string.Rs)+base);
-                textView_ProductBasePrice.setPaintFlags(textView_ProductBasePrice.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
-                if(save>0)
-                {
-                    textView_ProductsavePrice.setText("You will save "+getResources().getString(R.string.Rs)+save);
-                    int offerPer=(save*100)/base;
-                    if(offerPer>1)
-                    {
-                        offerLabel.setBackground(getActivity().getDrawable(R.drawable.ic_local_offer_black_24dp));
-                        offerLabel.setText(offerPer+"%\noff");
-                    }
-                }
-
-                String desc="Category       :"+dataSnapshot.child("product_category").getValue().toString()+"\n"+
+                    String desc="Category       :"+dataSnapshot.child("product_category").getValue().toString()+"\n"+
                             "Product Info :"+dataSnapshot.child("product_desc").getValue().toString()+"\n"+
                             "Product ID    :"+prdid;
 
-                textView_Desc.setText(desc);
+                    textView_Desc.setText(desc);
 
 
 
 
 
-            }
+                }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
 
-            }
-        });
+                }
+            });
+        }
+
 
 
         buy_button.setOnClickListener(new View.OnClickListener() {
@@ -126,6 +135,27 @@ public class ProductHomePageFragment extends Fragment {
 
                 ((HomeDrawableActivity)getActivity()).showMapFragment(prdid);
 
+            }
+        });
+
+        addcart_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DatabaseReference dbr =FirebaseDatabase.getInstance().getReference().child("Users").child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                        .child("Mycart").child(prdid);
+                dbr.child("product_id").setValue(prdid);
+                dbr.child("timestamp").setValue(ServerValue.TIMESTAMP);
+                dbr.child("product_qty").setValue(Integer.parseInt(editText_qty.getText().toString()))
+                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                if(task.isSuccessful())
+                                {
+                                    Toast.makeText(getActivity(), "Added To Cart", Toast.LENGTH_SHORT).show();
+                                }
+
+                            }
+                        });
             }
         });
 

@@ -73,8 +73,8 @@ import adapter.ProductAdapter;
 import fragment.LoginPageFragment;
 import fragment.MapFragment;
 import fragment.ProductBillFragment;
-import fragment.ProductHomePageFragment;
 import fragment.SearchProductFragment;
+import fragment.ShoppingCartFragment;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -218,7 +218,38 @@ public class HomeDrawableActivity extends AppCompatActivity
         return true;
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
 
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.cart_menu) {
+            showShoppingCartFragment();
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void showShoppingCartFragment() {
+        if(getSupportFragmentManager().findFragmentByTag(ShoppingCartFragment.TAG)==null )
+        {
+            ShoppingCartFragment shoppingCartFragment=new ShoppingCartFragment();
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.productHomeContainer,shoppingCartFragment,shoppingCartFragment.TAG)
+                    .addToBackStack(null)
+                    .commit();
+        }else
+        {
+            getSupportFragmentManager().beginTransaction()
+                    .show((ShoppingCartFragment)getSupportFragmentManager().findFragmentByTag(ShoppingCartFragment.TAG))
+                    .commit();
+
+        }
+    }
 
 
     @SuppressWarnings("StatementWithEmptyBody")
