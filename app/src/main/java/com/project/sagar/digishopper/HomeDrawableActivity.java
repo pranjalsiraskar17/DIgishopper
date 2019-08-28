@@ -75,8 +75,8 @@ import fragment.MapFragment;
 import fragment.MyAccountFragment;
 import fragment.MyOrderFragment;
 import fragment.ProductBillFragment;
-import fragment.ProductHomePageFragment;
 import fragment.SearchProductFragment;
+import fragment.ShoppingCartFragment;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -167,26 +167,6 @@ public class HomeDrawableActivity extends AppCompatActivity
             }
         });
 
-//        searchViewproductSearchBar.setOnQueryTextListener(new SearchView.OnQueryTextListener(){
-//
-//            @Override
-//            public boolean onQueryTextSubmit(String query) {
-//                SearchProductFragment searchProductFragment=new SearchProductFragment();
-//                Bundle bundle=new Bundle();
-//                bundle.putString("prdquery",query);
-//                searchProductFragment.setArguments(bundle);
-//                getSupportFragmentManager().beginTransaction()
-//                        .replace(R.id.productHomeContainer,searchProductFragment,searchProductFragment.TAG)
-//                        .addToBackStack(null)
-//                        .commit();
-//                return false;
-//            }
-//
-//            @Override
-//            public boolean onQueryTextChange(String s) {
-//                return false;
-//            }
-//        });
 
 
         NavigationView navigationView = findViewById(R.id.nav_view);
@@ -241,7 +221,38 @@ public class HomeDrawableActivity extends AppCompatActivity
         return true;
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
 
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.cart_menu) {
+            showShoppingCartFragment();
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void showShoppingCartFragment() {
+        if(getSupportFragmentManager().findFragmentByTag(ShoppingCartFragment.TAG)==null )
+        {
+            ShoppingCartFragment shoppingCartFragment=new ShoppingCartFragment();
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.productHomeContainer,shoppingCartFragment,shoppingCartFragment.TAG)
+                    .addToBackStack(null)
+                    .commit();
+        }else
+        {
+            getSupportFragmentManager().beginTransaction()
+                    .show((ShoppingCartFragment)getSupportFragmentManager().findFragmentByTag(ShoppingCartFragment.TAG))
+                    .commit();
+
+        }
+    }
 
 
     @SuppressWarnings("StatementWithEmptyBody")
@@ -382,22 +393,36 @@ public class HomeDrawableActivity extends AppCompatActivity
         });
     }
 
-    public void showMapFragment(String prdid)
+    public void showMapFragment(String prdid,int qty)
     {
         MapFragment mapFragment=new MapFragment();
         Bundle bundle=new Bundle();
         bundle.putString("prdidToAddress",prdid);
+        bundle.putString("parentFrag","prdhome");
+        bundle.putInt("qty",qty);
         mapFragment.setArguments(bundle);
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.productHomeContainer,mapFragment,mapFragment.TAG)
                 .addToBackStack(null)
                 .commit();
     }
-    public void showProductBillFragment(String prdid,String address,String name,String mobile)
+    public void showMapFragment(HashMap<String,ArrayList<String>> map)
+    {
+        MapFragment mapFragment=new MapFragment();
+        Bundle bundle=new Bundle();
+        bundle.putSerializable("cartmap",map);
+        bundle.putString("parentFrag","cart");
+        mapFragment.setArguments(bundle);
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.productHomeContainer,mapFragment,mapFragment.TAG)
+                .addToBackStack(null)
+                .commit();
+    }
+    public void showProductBillFragment(HashMap<String,ArrayList<String>> map,String address,String name,String mobile)
     {
         ProductBillFragment productBillFragment=new ProductBillFragment();
         Bundle bundle=new Bundle();
-        bundle.putString("prdidToBookOrder",prdid);
+        bundle.putSerializable("prdmap",map);
         bundle.putString("address",address);
         bundle.putString("name",name);
         bundle.putString("mobile",mobile);

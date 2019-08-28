@@ -33,6 +33,8 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.project.sagar.digishopper.HomeDrawableActivity;
 import com.project.sagar.digishopper.R;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
@@ -44,7 +46,9 @@ public class MapFragment extends Fragment implements LocationListener {
     private LocationManager mLocationManager;
     private TextInputEditText txt_name,txt_mobile,txt_add1,txt_add2, txt_street_locality, txt_landmarkTxt, txt_pinTxt, txt_district;
     private Button isDeliverable,btnCheckout;
-    String address="",prdid="";
+    String address="",prdid="",parentFrag="";
+    public HashMap<String, ArrayList<String>> cartmap=new HashMap<>();
+    int qty;
 
     @TargetApi(Build.VERSION_CODES.P)
     @Nullable
@@ -63,7 +67,19 @@ public class MapFragment extends Fragment implements LocationListener {
         btnCheckout=(Button)view.findViewById(R.id.button_buy);
 
         Bundle bundle=getArguments();
-        prdid=bundle.getString("prdidToAddress");
+        if(bundle!=null)
+        {
+            parentFrag=bundle.getString("parentFrag");
+           if(parentFrag.equals("cart"))
+           {
+               cartmap=(HashMap<String, ArrayList<String>>) bundle.getSerializable("cartmap");
+           }else
+           {
+               prdid=bundle.getString("prdidToAddress");
+               qty=bundle.getInt("qty");
+           }
+        }
+
         mLocationManager = (LocationManager) getActivity().getSystemService(LOCATION_SERVICE);
 
 //        if (getActivity().checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && getActivity().checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -134,8 +150,22 @@ public class MapFragment extends Fragment implements LocationListener {
         btnCheckout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if(parentFrag.equals("cart"))
+                {
+                    ((HomeDrawableActivity)getActivity()).showProductBillFragment(cartmap,address,txt_name.getText().toString(),txt_mobile.getText().toString());
 
-                ((HomeDrawableActivity)getActivity()).showProductBillFragment(prdid,address,txt_name.getText().toString(),txt_mobile.getText().toString());
+                }else
+                {
+                    ArrayList<String>prdlist=new ArrayList<>();
+                    ArrayList<String>qtylist=new ArrayList<>();
+                    prdlist.add(prdid);
+                    qtylist.add(String.valueOf(qty));
+                    HashMap<String,ArrayList<String>> map=new HashMap<String, ArrayList<String>>();
+                    map.put("prd",prdlist);
+                    map.put("qty",qtylist);
+                    ((HomeDrawableActivity)getActivity()).showProductBillFragment(map,address,txt_name.getText().toString(),txt_mobile.getText().toString());
+                }
+
             }
         });
 
