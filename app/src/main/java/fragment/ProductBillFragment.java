@@ -118,7 +118,12 @@ public class ProductBillFragment extends Fragment {
                         nftRef.child("prd_id").setValue(prdid);
                         nftRef.child("order_type").setValue("ordered");
                         nftRef.child("txn_timestamp").setValue(ServerValue.TIMESTAMP);
-                        nftRef.child("buyer_userkey").setValue(userKey);
+                        nftRef.child("buyer_userkey").setValue(userKey).addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                nftCounter.setValue(nftid);
+                            }
+                        });
                     }
 
                     @Override

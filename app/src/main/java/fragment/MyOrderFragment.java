@@ -39,8 +39,6 @@ public class MyOrderFragment extends Fragment {
         heading=view.findViewById(R.id.heading);
         heading.setText("My Orders");
         recyclerView=view.findViewById(R.id.recycler_myorder);
-        recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         DatabaseReference ordersRef= FirebaseDatabase.getInstance().getReference().child("Orders");
         Bundle bundle=getArguments();
         myOrderClasses=new ArrayList<>();
@@ -54,6 +52,8 @@ public class MyOrderFragment extends Fragment {
                     myOrderClasses.add(myOrderClass);
                 }
                 myOrderAdapter=new MyOrderAdapter(getActivity(),myOrderClasses);
+                recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+                recyclerView.setAdapter(myOrderAdapter);
             }
 
             @Override
