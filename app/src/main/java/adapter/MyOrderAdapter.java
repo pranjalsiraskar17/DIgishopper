@@ -35,11 +35,9 @@ public class MyOrderAdapter extends RecyclerView.Adapter<MyOrderAdapter.MyOrderV
     @Override
     public void onBindViewHolder(@NonNull MyOrderAdapter.MyOrderViewholder holder, final int position) {
 
-        holder.txtPrdId.setText("Product ID");
+
         holder.txtPrdIdValue.setText(myOrderClasses.get(position).getPrd_id());
-        holder.order_id.setText("Order_ID");
         holder.order_id_value.setText(myOrderClasses.get(position).getTxn_id());
-        holder.order_status.setText("Order Status");
         holder.order_status_value.setText(myOrderClasses.get(position).getOrder_status());
 
 

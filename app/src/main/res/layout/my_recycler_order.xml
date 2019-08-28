@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -42,6 +42,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_margin="2dp"
+                        android:text="Product Id"
                         android:textSize="14dp" />
                    <TextView
                        android:id="@+id/txtPrdIdValue"
@@ -60,6 +61,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_margin="2dp"
+                        android:text="Order ID"
                         android:textSize="14dp" />
                     <TextView
                         android:id="@+id/order_id_value"
@@ -79,6 +81,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_margin="2dp"
+                        android:text="Address"
                         android:textSize="14dp" />
                     <TextView
                         android:id="@+id/order_address_value"
@@ -98,6 +101,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_margin="2dp"
+                        android:text="Status"
                         android:textSize="14dp" />
                     <TextView
                         android:id="@+id/order_status_value"
@@ -115,4 +119,4 @@
 
 
 
-</RelativeLayout>
+</LinearLayout>

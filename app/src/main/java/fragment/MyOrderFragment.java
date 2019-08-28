@@ -43,6 +43,7 @@ public class MyOrderFragment extends Fragment {
         Bundle bundle=getArguments();
         myOrderClasses=new ArrayList<>();
         final String userID=bundle.getString("userid");
+
         Query query=ordersRef.orderByChild("buyer_userkey").equalTo(userID);
         query.addValueEventListener(new ValueEventListener() {
             @Override
@@ -51,8 +52,9 @@ public class MyOrderFragment extends Fragment {
                     MyOrderClass myOrderClass = postSnapshot.getValue(MyOrderClass.class);
                     myOrderClasses.add(myOrderClass);
                 }
-                myOrderAdapter=new MyOrderAdapter(getActivity(),myOrderClasses);
                 recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+                myOrderAdapter=new MyOrderAdapter(getActivity(),myOrderClasses);
+
                 recyclerView.setAdapter(myOrderAdapter);
             }
 
