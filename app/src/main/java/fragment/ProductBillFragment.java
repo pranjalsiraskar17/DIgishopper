@@ -97,6 +97,7 @@ public class ProductBillFragment extends Fragment {
                                 txnid=Integer.parseInt(dataSnapshot.getValue().toString())+1;
                                 txnRef=FirebaseDatabase.getInstance().getReference().child("Orders").child("TXN"+txnid);
                                 txnRef.child("txn_id").setValue("TXN"+txnid);
+                                txnRef.child("txt_amt").setValue(Integer.parseInt(basePrice.getText().toString()));
                                 txnRef.child("order_address").setValue(address);
                                 txnRef.child("buyer_name").setValue(name);
                                 txnRef.child("buyer_phone").setValue(mobile);
