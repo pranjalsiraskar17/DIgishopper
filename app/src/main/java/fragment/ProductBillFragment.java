@@ -110,7 +110,7 @@ public class ProductBillFragment extends Fragment {
                                             .child("ProductInfo").child(id).addListenerForSingleValueEvent(new ValueEventListener() {
                                         @Override
                                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                            txnRef.child(id).child("product_price").setValue(dataSnapshot.child("product_selling_price").toString());
+                                            txnRef.child(id).child("product_price").setValue(dataSnapshot.child("product_selling_price").getValue().toString());
                                             txnRef.child(id).child("prd_id").setValue(id);
                                             txnRef.child(id).child("order_status").setValue("ordered");
                                             txnRef.child(id).child("product_qty").setValue(qty);
