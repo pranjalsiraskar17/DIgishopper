@@ -160,7 +160,7 @@ public class ProductBillFragment extends Fragment {
                         final int nftid=Integer.parseInt(dataSnapshot.getValue().toString())+1;
                         DatabaseReference nftRef=FirebaseDatabase.getInstance().getReference().child("Notifications").child("Merchant").child("NFT"+nftid);
                         nftRef.child("txn_id").setValue("TXN"+txnid);
-                        nftRef.child("order_type").setValue("ordered");
+                        nftRef.child("order_type").setValue("Ordered");
                         nftRef.child("txn_timestamp").setValue(ServerValue.TIMESTAMP);
                         nftRef.child("buyer_userkey").setValue(userKey).addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override

@@ -18,43 +18,41 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
-import com.project.sagar.digishopper.MyOrderClass;
+import com.project.sagar.digishopper.MyProductInOrderClass;
 import com.project.sagar.digishopper.R;
 
 import java.util.ArrayList;
 
 import adapter.MyOrderAdapter;
+import adapter.MyProductInOrderAdapter;
 
-public class MyOrderFragment extends Fragment {
-    public static final String TAG=MyOrderAdapter.class.getSimpleName();
+public class MyProductInOrderFragment extends Fragment {
+    public static final String TAG= MyProductInOrderFragment.class.getSimpleName();
     private RecyclerView recyclerView;
-    private TextView heading;
-    private ArrayList<MyOrderClass>myOrderClasses;
-    private MyOrderAdapter myOrderAdapter;
+    private ArrayList<MyProductInOrderClass> myProductInOrderClassArrayList;
+    private MyProductInOrderAdapter myProductInOrderAdapter;
+
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.my_order_fragment, container, false);
-        heading=view.findViewById(R.id.heading);
-        heading.setText("My Orders");
-        recyclerView=view.findViewById(R.id.recycler_myorder);
-        DatabaseReference ordersRef= FirebaseDatabase.getInstance().getReference().child("Orders");
+        View view=inflater.inflate(R.layout.my_product_in_order_fragment,container,false);
+        recyclerView=view.findViewById(R.id.recycler_my_product_in_order);
         Bundle bundle=getArguments();
-        myOrderClasses=new ArrayList<>();
-        final String userID=bundle.getString("userid");
-
-        Query query=ordersRef.orderByChild("buyer_userkey").equalTo(userID);
+        final String txn=bundle.getString("txnId");
+        DatabaseReference ordersRef= FirebaseDatabase.getInstance().getReference().child("Orders").child(txn);
+        Query query=ordersRef.orderByKey().startAt("DG").endAt("DG"+"\uF8FF");
+        myProductInOrderClassArrayList=new ArrayList<>();
         query.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-                    MyOrderClass myOrderClass = postSnapshot.getValue(MyOrderClass.class);
-                    myOrderClasses.add(myOrderClass);
+                    MyProductInOrderClass myProductInOrderClass=postSnapshot.getValue(MyProductInOrderClass.class);
+                    myProductInOrderClassArrayList.add(myProductInOrderClass);
                 }
                 recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-                myOrderAdapter=new MyOrderAdapter(getActivity(),myOrderClasses);
-                recyclerView.setAdapter(myOrderAdapter);
+                myProductInOrderAdapter=new MyProductInOrderAdapter(getActivity(),myProductInOrderClassArrayList);
+                recyclerView.setAdapter(myProductInOrderAdapter);
             }
 
             @Override
@@ -62,7 +60,6 @@ public class MyOrderFragment extends Fragment {
 
             }
         });
-
-        return view;
+        return  view;
     }
 }
