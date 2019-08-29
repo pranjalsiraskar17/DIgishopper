@@ -34,6 +34,7 @@ public class ProductBillFragment extends Fragment {
     Button bookBtn;
     HashMap<String,ArrayList<String>> map=new HashMap<>();
     String address,name,mobile;
+    DatabaseReference txnRef;
     int base,selling;
     ArrayList<String> prdidlist=new ArrayList<>();
     ArrayList<String> qtylist=new ArrayList<>();
@@ -94,7 +95,7 @@ public class ProductBillFragment extends Fragment {
                                 final String userKey= FirebaseAuth.getInstance().getCurrentUser().getUid();
                                 final DatabaseReference cartref=FirebaseDatabase.getInstance().getReference().child("Users").child(userKey).child("Mycart");
                                 txnid=Integer.parseInt(dataSnapshot.getValue().toString())+1;
-                                DatabaseReference txnRef=FirebaseDatabase.getInstance().getReference().child("Orders").child("TXN"+txnid);
+                                txnRef=FirebaseDatabase.getInstance().getReference().child("Orders").child("TXN"+txnid);
                                 txnRef.child("txn_id").setValue("TXN"+txnid);
                                 txnRef.child("order_address").setValue(address);
                                 txnRef.child("buyer_name").setValue(name);
@@ -104,36 +105,48 @@ public class ProductBillFragment extends Fragment {
                                 {
 
                                     final String id=prdidlist.get(j);
-                                    int qty=Integer.parseInt(qtylist.get(j));
-
-                                    txnRef.child(id).child("prd_id").setValue(id);
-                                    txnRef.child(id).child("order_status").setValue("ordered");
-                                    txnRef.child(id).child("product_qty").setValue(qty);
-                                    txnRef.child(id).child("txn_timestamp").setValue(ServerValue.TIMESTAMP)
-                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                @Override
-                                                public void onSuccess(Void aVoid) {
-                                                    txtCounterRef.setValue(txnid);
-                                                    DatabaseReference odersRef=FirebaseDatabase.getInstance().getReference().child("Users").child(userKey).child("Myorders").child("TXN"+txnid);
-                                                    odersRef.child("order_status").setValue("ordered");
-                                                    odersRef.child("txn_id").setValue("TXN"+txnid).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    final int qty=Integer.parseInt(qtylist.get(j));
+                                    FirebaseDatabase.getInstance().getReference()
+                                            .child("ProductInfo").child(id).addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                            txnRef.child(id).child("product_price").setValue(dataSnapshot.child("product_selling_price").toString());
+                                            txnRef.child(id).child("prd_id").setValue(id);
+                                            txnRef.child(id).child("order_status").setValue("ordered");
+                                            txnRef.child(id).child("product_qty").setValue(qty);
+                                            txnRef.child(id).child("txn_timestamp").setValue(ServerValue.TIMESTAMP)
+                                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
                                                         @Override
                                                         public void onSuccess(Void aVoid) {
-                                                            cartref.child(id).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                            txtCounterRef.setValue(txnid);
+                                                            DatabaseReference odersRef=FirebaseDatabase.getInstance().getReference().child("Users").child(userKey).child("Myorders").child("TXN"+txnid);
+                                                            odersRef.child("order_status").setValue("ordered");
+                                                            odersRef.child("txn_id").setValue("TXN"+txnid).addOnSuccessListener(new OnSuccessListener<Void>() {
                                                                 @Override
-                                                                public void onComplete(@NonNull Task<Void> task) {
+                                                                public void onSuccess(Void aVoid) {
+                                                                    cartref.child(id).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                                        @Override
+                                                                        public void onComplete(@NonNull Task<Void> task) {
 
-                                                                        Toast.makeText(getActivity(), "Booking Done !", Toast.LENGTH_SHORT).show();
-                                                                        ((HomeDrawableActivity)getActivity()).removeAllFragment();
+                                                                            Toast.makeText(getActivity(), "Booking Done !", Toast.LENGTH_SHORT).show();
+                                                                            ((HomeDrawableActivity)getActivity()).removeAllFragment();
+
+                                                                        }
+                                                                    });
+
 
                                                                 }
                                                             });
-
-
                                                         }
                                                     });
-                                                }
-                                            });
+                                        }
+
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                        }
+                                    });
+
                                 }
 
                                 txnRef.child("txn_id").setValue("TXN"+txnid);
@@ -173,8 +186,8 @@ public class ProductBillFragment extends Fragment {
                     @Override
                     public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                    }
-                });
+                            }
+                        });
             }
         });
 
