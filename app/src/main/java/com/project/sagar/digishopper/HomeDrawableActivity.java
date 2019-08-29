@@ -72,6 +72,8 @@ import Notification.Token;
 import adapter.ProductAdapter;
 import fragment.LoginPageFragment;
 import fragment.MapFragment;
+import fragment.MyAccountFragment;
+import fragment.MyOrderFragment;
 import fragment.ProductBillFragment;
 import fragment.SearchProductFragment;
 import fragment.ShoppingCartFragment;
@@ -99,6 +101,7 @@ public class HomeDrawableActivity extends AppCompatActivity
         setContentView(R.layout.activity_home_drawable);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
         final ArrayList<String> imageList=new ArrayList<>();
         user=FirebaseAuth.getInstance().getCurrentUser();
         DatabaseReference dbruser=FirebaseDatabase.getInstance().getReference().child("Users").child(user.getUid());
@@ -139,7 +142,7 @@ public class HomeDrawableActivity extends AppCompatActivity
 
         for(int i=0;i<imageList.size();i++)
         {
-                flipImage(imageList.get(i));
+            flipImage(imageList.get(i));
         }
 
         apiService = Client.getClient("https://fcm.googlepis.com/").create(APIService.class);
@@ -260,12 +263,28 @@ public class HomeDrawableActivity extends AppCompatActivity
 
         if (id == R.id.nav_myorder) {
             // Handle the camera action
+            MyOrderFragment myOrderFragment =new MyOrderFragment();
+            Bundle bundle = new Bundle();
+            bundle.putString("userid",user.getUid());
+            myOrderFragment.setArguments(bundle);
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.productHomeContainer, myOrderFragment, myOrderFragment.TAG)
+                    .addToBackStack(null)
+                    .commit();
+
+
         } else if (id == R.id.nav_mynotification) {
             sendNotification(user.getUid(),"","");
 
         } else if (id == R.id.nav_mywishlist) {
 
         } else if (id == R.id.nav_myaccount) {
+            MyAccountFragment myAccountFragment=new MyAccountFragment();
+
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.productHomeContainer,myAccountFragment,myAccountFragment.TAG)
+                    .addToBackStack(null)
+                    .commit();
 
         } else if (id == R.id.nav_setting) {
 
@@ -421,3 +440,6 @@ public class HomeDrawableActivity extends AppCompatActivity
     }
 
 }
+
+
+
