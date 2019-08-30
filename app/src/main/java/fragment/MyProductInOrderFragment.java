@@ -31,7 +31,7 @@ public class MyProductInOrderFragment extends Fragment {
     private RecyclerView recyclerView;
     private ArrayList<MyProductInOrderClass> myProductInOrderClassArrayList;
     private MyProductInOrderAdapter myProductInOrderAdapter;
-
+    TextView heading;
 
     @Nullable
     @Override
@@ -41,6 +41,8 @@ public class MyProductInOrderFragment extends Fragment {
         Bundle bundle=getArguments();
         final String txn=bundle.getString("txnId");
         DatabaseReference ordersRef= FirebaseDatabase.getInstance().getReference().child("Orders").child(txn);
+        heading=view.findViewById(R.id.heading);
+        heading.setText(txn);
         Query query=ordersRef.orderByKey().startAt("DG").endAt("DG"+"\uF8FF");
         myProductInOrderClassArrayList=new ArrayList<>();
         query.addValueEventListener(new ValueEventListener() {
