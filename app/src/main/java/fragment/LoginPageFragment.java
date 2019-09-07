@@ -197,6 +197,7 @@ public class LoginPageFragment extends Fragment {
         {
             getFragmentManager().beginTransaction()
                     .replace(R.id.loginContainer,verifyEmailFragment,verifyEmailFragment.TAG)
+                    .addToBackStack(null)
                     .commit();
         }
 

@@ -1,5 +1,6 @@
 package fragment;
 
+import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -40,6 +41,7 @@ public class ProductBillFragment extends Fragment {
     ArrayList<String> qtylist=new ArrayList<>();
     int txnid;
     int j;
+    ProgressDialog progressDialog;
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -88,6 +90,11 @@ public class ProductBillFragment extends Fragment {
         bookBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                progressDialog=new ProgressDialog(getActivity());
+                progressDialog.setTitle("Please Wait...");
+                progressDialog.setMessage("Product booking processing...");
+                progressDialog.setCanceledOnTouchOutside(false);
+                progressDialog.show();
                 final DatabaseReference txtCounterRef=FirebaseDatabase.getInstance().getReference().child("txtCounter");
                 txtCounterRef.addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
@@ -97,8 +104,9 @@ public class ProductBillFragment extends Fragment {
                                 txnid=Integer.parseInt(dataSnapshot.getValue().toString())+1;
                                 txnRef=FirebaseDatabase.getInstance().getReference().child("Orders").child("TXN"+txnid);
                                 txnRef.child("txn_id").setValue("TXN"+txnid);
-                                txnRef.child("txt_amt").setValue(Integer.parseInt(basePrice.getText().toString()));
+                                txnRef.child("txt_amt").setValue(Integer.parseInt(String.valueOf(base)));
                                 txnRef.child("order_address").setValue(address);
+                                txnRef.child("order_status").setValue("ordered");
                                 txnRef.child("buyer_name").setValue(name);
                                 txnRef.child("buyer_phone").setValue(mobile);
                                 txnRef.child("buyer_userkey").setValue(userKey);
@@ -113,7 +121,6 @@ public class ProductBillFragment extends Fragment {
                                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                             txnRef.child(id).child("product_price").setValue(dataSnapshot.child("product_selling_price").getValue().toString());
                                             txnRef.child(id).child("prd_id").setValue(id);
-                                            txnRef.child(id).child("order_status").setValue("ordered");
                                             txnRef.child(id).child("product_qty").setValue(qty);
                                             txnRef.child(id).child("txn_timestamp").setValue(ServerValue.TIMESTAMP)
                                                     .addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -129,6 +136,7 @@ public class ProductBillFragment extends Fragment {
                                                                         @Override
                                                                         public void onComplete(@NonNull Task<Void> task) {
 
+                                                                            progressDialog.dismiss();
                                                                             Toast.makeText(getActivity(), "Booking Done !", Toast.LENGTH_SHORT).show();
                                                                             ((HomeDrawableActivity)getActivity()).removeAllFragment();
 

@@ -52,7 +52,7 @@ public class MyFirebaseIdService extends FirebaseMessagingService {
 
     private void sendNewNotification(RemoteMessage remoteMessage) {
         String user=remoteMessage.getData().get("user");
-        String icon=remoteMessage.getData().get("icon");
+        String icon=remoteMessage.getData().get("mainicon");
         String title=remoteMessage.getData().get("title");
         String body=remoteMessage.getData().get("body");
 
@@ -75,7 +75,7 @@ public class MyFirebaseIdService extends FirebaseMessagingService {
 
     private void sendNotification(RemoteMessage remoteMessage) {
         String user=remoteMessage.getData().get("user");
-        String icon=remoteMessage.getData().get("icon");
+        String icon=remoteMessage.getData().get("mainicon");
         String title=remoteMessage.getData().get("title");
         String body=remoteMessage.getData().get("body");
 

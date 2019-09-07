@@ -42,6 +42,7 @@ public class MyOrderAdapter extends RecyclerView.Adapter<MyOrderAdapter.MyOrderV
 
 
         holder.order_id_value.setText(myOrderClasses.get(position).getTxn_id());
+        holder.txn_amt.setText(String.valueOf(myOrderClasses.get(position).getTxt_amt()));
         holder.order_status_value.setText(myOrderClasses.get(position).getOrder_status());
         holder.layout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -67,7 +68,7 @@ public class MyOrderAdapter extends RecyclerView.Adapter<MyOrderAdapter.MyOrderV
     }
 
     public class MyOrderViewholder extends RecyclerView.ViewHolder {
-        TextView order_id,order_id_value,order_status,order_status_value;
+        TextView order_id,order_id_value,order_status,order_status_value,txn_amt;
         LinearLayout layout;
         public MyOrderViewholder(@NonNull View itemView) {
             super(itemView);
@@ -76,6 +77,7 @@ public class MyOrderAdapter extends RecyclerView.Adapter<MyOrderAdapter.MyOrderV
             order_id_value=itemView.findViewById(R.id.order_id_value);
             order_status=itemView.findViewById(R.id.order_status);
             order_status_value=itemView.findViewById(R.id.order_status_value);
+            txn_amt=itemView.findViewById(R.id.order_amount_value);
         }
     }
 }

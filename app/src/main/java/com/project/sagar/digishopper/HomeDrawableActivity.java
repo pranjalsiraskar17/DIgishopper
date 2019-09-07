@@ -1,11 +1,19 @@
 package com.project.sagar.digishopper;
 
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Paint;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -20,6 +28,8 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 
@@ -62,6 +72,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 
 import Notification.APIService;
 import Notification.Client;
@@ -82,7 +94,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class HomeDrawableActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener, LocationListener {
     private RecyclerView product_recyclerView;
     private DatabaseReference productRef;
     private ProductAdapter adapter;
@@ -95,16 +107,26 @@ public class HomeDrawableActivity extends AppCompatActivity
     APIService apiService;
     FirebaseUser user;
     EditText productSearchBar;
+    TextView txtLocation;
+    LocationManager locationManager;
+    ProgressDialog progressDialog;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_drawable);
         Toolbar toolbar = findViewById(R.id.toolbar);
+        txtLocation=findViewById(R.id.txtLocation);
         setSupportActionBar(toolbar);
+        progressDialog=new ProgressDialog(this);
+        progressDialog.setTitle("Please Wait...");
+        progressDialog.setMessage("We are fetching your records...");
+        progressDialog.setCanceledOnTouchOutside(false);
+        progressDialog.show();
 
         final ArrayList<String> imageList=new ArrayList<>();
         user=FirebaseAuth.getInstance().getCurrentUser();
-        DatabaseReference dbruser=FirebaseDatabase.getInstance().getReference().child("Users").child(user.getUid());
+
+        final DatabaseReference dbruser=FirebaseDatabase.getInstance().getReference().child("Users").child(user.getUid());
         dbruser.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -112,6 +134,36 @@ public class HomeDrawableActivity extends AppCompatActivity
                 String fname=dataSnapshot.child("user_fname").getValue().toString();
                 String lname=dataSnapshot.child("user_lname").getValue().toString();
                 username.setText(fname+" "+lname);
+                String add="";
+                if(dataSnapshot.child("user_address").child("add1").getValue()!=null)
+                add+=dataSnapshot.child("user_address").child("add1").getValue().toString();
+
+                if(dataSnapshot.child("user_address").child("add2").getValue()!=null)
+                    add+=" "+dataSnapshot.child("user_address").child("add2").getValue().toString();
+
+                if(dataSnapshot.child("user_address").child("street_locality").getValue()!=null)
+                    add+=" "+dataSnapshot.child("user_address").child("street_locality").getValue().toString();
+
+                if(dataSnapshot.child("user_address").child("landmark").getValue()!=null)
+                    add+=" "+dataSnapshot.child("user_address").child("landmark").getValue().toString();
+
+                if(dataSnapshot.child("user_address").child("district").getValue()!=null)
+                    add+=" "+dataSnapshot.child("user_address").child("district").getValue().toString();
+
+                if(dataSnapshot.child("user_address").child("pin").getValue()!=null)
+                    add+=" "+dataSnapshot.child("user_address").child("pin").getValue().toString();
+
+                if(add.length()!=0)
+                {
+                    txtLocation.setText(add);
+                }else
+                {
+                    txtLocation.setText("Add Delivery Address");
+                }
+                progressDialog.dismiss();
+
+
+
             }
 
             @Override
@@ -164,6 +216,21 @@ public class HomeDrawableActivity extends AppCompatActivity
                     return true;
                 }
                 return false;
+            }
+        });
+
+
+        txtLocation.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if(event.getAction() == MotionEvent.ACTION_UP) {
+                    if(event.getRawX() >= txtLocation.getRight() - txtLocation.getTotalPaddingRight()) {
+                        showMapFragment();
+
+                        return true;
+                    }
+                }
+                return true;
             }
         });
 
@@ -247,9 +314,12 @@ public class HomeDrawableActivity extends AppCompatActivity
                     .commit();
         }else
         {
+            ShoppingCartFragment shoppingCartFragment=(ShoppingCartFragment)getSupportFragmentManager().findFragmentByTag(ShoppingCartFragment.TAG);
             getSupportFragmentManager().beginTransaction()
-                    .show((ShoppingCartFragment)getSupportFragmentManager().findFragmentByTag(ShoppingCartFragment.TAG))
+                    .replace(R.id.productHomeContainer,shoppingCartFragment,shoppingCartFragment.TAG)
+                    .addToBackStack(null)
                     .commit();
+
 
         }
     }
@@ -288,7 +358,12 @@ public class HomeDrawableActivity extends AppCompatActivity
 
         } else if (id == R.id.nav_setting) {
 
-        } else if (id == R.id.sign_out_menu) {
+        }
+        else if (id == R.id.nav_home) {
+            removeAllFragment();
+
+        }
+        else if (id == R.id.sign_out_menu) {
             FirebaseAuth.getInstance().signOut();
             Intent loginIntent=new Intent(HomeDrawableActivity.this,LoginActivity.class);
             startActivity(loginIntent);
@@ -393,6 +468,18 @@ public class HomeDrawableActivity extends AppCompatActivity
         });
     }
 
+    public void showMapFragment(){
+        MapFragment mapFragment=new MapFragment();
+        Bundle bundle=new Bundle();
+        bundle.putString("parentFrag","prdhome1");
+        mapFragment.setArguments(bundle);
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.productHomeContainer,mapFragment,mapFragment.TAG)
+                .addToBackStack(null)
+                .commit();
+
+    }
+
     public void showMapFragment(String prdid,int qty)
     {
         MapFragment mapFragment=new MapFragment();
@@ -439,6 +526,47 @@ public class HomeDrawableActivity extends AppCompatActivity
         }
     }
 
+    @Override
+    public void onLocationChanged(Location location) {
+
+        //locationText.setText("Latitude: " + location.getLatitude() + "\n Longitude: " + location.getLongitude());
+
+        try {
+            Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+            List<Address> addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
+            Toast.makeText(this, addresses.get(0).getAddressLine(0)+", "+ addresses.get(0).getAddressLine(1)+", "+addresses.get(0).getAddressLine(2) , Toast.LENGTH_SHORT).show();
+            txtLocation.setText(" Deliver To - "+addresses.get(0).getAddressLine(0));
+        }catch(Exception e)
+        {
+
+        }
+
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+
+    }
+
+    void getLocation() {
+        try {
+            locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 5000, 5, this);
+        }
+        catch(SecurityException e) {
+            e.printStackTrace();
+        }
+    }
 }
 
 
