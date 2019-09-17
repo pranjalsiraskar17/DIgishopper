@@ -75,12 +75,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
-import Notification.APIService;
-import Notification.Client;
-import Notification.Data;
-import Notification.MyResponce;
-import Notification.Sender;
-import Notification.Token;
 import adapter.ProductAdapter;
 import fragment.LoginPageFragment;
 import fragment.MapFragment;
@@ -104,7 +98,6 @@ public class HomeDrawableActivity extends AppCompatActivity
     private int CLICK_ACTION_THRESHOLD = 200;
     private ArrayList<AllProduct> productsList=new ArrayList<AllProduct>();
     private TextView username;
-    APIService apiService;
     FirebaseUser user;
     EditText productSearchBar;
     TextView txtLocation;
@@ -197,7 +190,6 @@ public class HomeDrawableActivity extends AppCompatActivity
             flipImage(imageList.get(i));
         }
 
-        apiService = Client.getClient("https://fcm.googlepis.com/").create(APIService.class);
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         product_recyclerView=findViewById(R.id.recyclerView);
         productSearchBar=(EditText) findViewById(R.id.searchView);
@@ -268,7 +260,6 @@ public class HomeDrawableActivity extends AppCompatActivity
             }
         });
 
-        updateToken(FirebaseInstanceId.getInstance().getToken());
     }
 
     @Override
@@ -344,7 +335,7 @@ public class HomeDrawableActivity extends AppCompatActivity
 
 
         } else if (id == R.id.nav_mynotification) {
-            sendNotification(user.getUid(),"","");
+
 
         } else if (id == R.id.nav_mywishlist) {
 
@@ -425,48 +416,10 @@ public class HomeDrawableActivity extends AppCompatActivity
         return !(differenceX > CLICK_ACTION_THRESHOLD/* =5 */ || differenceY > CLICK_ACTION_THRESHOLD);
     }
 
-    private void updateToken(String refreshToken){
-        FirebaseUser firebaseUser=FirebaseAuth.getInstance().getCurrentUser();
-        DatabaseReference reference= FirebaseDatabase.getInstance().getReference("Tokens");
-        Token token=new Token(refreshToken);
-        reference.child(firebaseUser.getUid()).setValue(token);
-    }
 
-    private void sendNotification(String receiver,String username,String message)
-    {
-        DatabaseReference tokens=FirebaseDatabase.getInstance().getReference("Tokens");
-        Query query=tokens.orderByKey().equalTo(receiver);
-        query.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for(DataSnapshot snapshot:dataSnapshot.getChildren()){
-                    Token token=snapshot.getValue(Token.class);
-                    Data data=new Data(FirebaseAuth.getInstance().getCurrentUser().getUid(),R.mipmap.ic_launcher,"msg","title",FirebaseAuth.getInstance().getCurrentUser().getUid());
-                    Sender sender=new Sender(data,token.getToken());
-                    apiService.sendNotification(sender)
-                            .enqueue(new Callback<MyResponce>() {
-                                @Override
-                                public void onResponse(Call<MyResponce> call, Response<MyResponce> response) {
-                                    if(response.body().success !=1){
-                                        Toast.makeText(HomeDrawableActivity.this, "failed", Toast.LENGTH_SHORT).show();
-                                    }
-                                }
 
-                                @Override
-                                public void onFailure(Call<MyResponce> call, Throwable t) {
 
-                                }
-                            });
 
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-    }
 
     public void showMapFragment(){
         MapFragment mapFragment=new MapFragment();
