@@ -27,6 +27,7 @@ import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 import com.project.sagar.digishopper.HomeDrawableActivity;
 import com.project.sagar.digishopper.R;
+import com.project.sagar.fcmnotifier.FCMNotifier;
 
 import org.json.JSONObject;
 
@@ -141,6 +142,7 @@ public class ProductBillFragment extends Fragment {
                                 txnRef.child("buyer_name").setValue(name);
                                 txnRef.child("buyer_phone").setValue(mobile);
                                 txnRef.child("buyer_userkey").setValue(userKey);
+                                txnRef.child("txn_timestamp").setValue(ServerValue.TIMESTAMP);
 
                                 for(j=0;j<prdidlist.size();j++)
                                 {
@@ -162,8 +164,7 @@ public class ProductBillFragment extends Fragment {
                                                 msg+=dataSnapshot.child("product_name").getValue().toString();
                                             }
 
-                                            txnRef.child(id).child("product_qty").setValue(qty);
-                                            txnRef.child(id).child("txn_timestamp").setValue(ServerValue.TIMESTAMP)
+                                            txnRef.child(id).child("product_qty").setValue(qty)
                                                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                                                         @Override
                                                         public void onSuccess(Void aVoid) {
@@ -182,7 +183,21 @@ public class ProductBillFragment extends Fragment {
                                                                                 ((HomeDrawableActivity)getActivity()).removeAllFragment();
                                                                                 if(!isCompleted)
                                                                                 {
-                                                                                    new Notify().execute();
+//                                                                                    new Notify().execute();
+                                                                                    FCMNotifier notifier=new FCMNotifier("AIzaSyCvSWo7HKk0XFC69J9QQTtCovkWzHcKm0M",token);
+                                                                                    notifier.setTitle("New Order");
+                                                                                    notifier.setMsg("You have order of "+msg);
+                                                                                    if(notifier.send())
+                                                                                    {
+                                                                                        Toast.makeText(getActivity(), "Done", Toast.LENGTH_SHORT).show();
+                                                                                    }else
+                                                                                    {
+                                                                                        Toast.makeText(getActivity(), "Failed", Toast.LENGTH_SHORT).show();
+
+                                                                                    }
+                                                                                    //notifier.send();
+
+
                                                                                     isCompleted=true;
                                                                                 }
 
