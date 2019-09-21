@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:background="@color/white"
+    android:layout_height="match_parent">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <LinearLayout
+                android:id="@+id/linear"
+                android:layout_marginTop="2dp"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:gravity="center"
+                android:background="@color/colorPrimary"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/txtBillTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp"
+                    android:textColor="@color/white"
+                    android:textStyle="bold"
+                    android:text="Confirm Your Order"
+                    android:gravity="center"
+                    android:textSize="20dp" />
+
+            </LinearLayout>
+            <ImageView
+                android:id="@+id/imageview123"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_below="@+id/linear"
+                android:layout_gravity="center"
+                android:layout_marginTop="-10dp"
+                android:background="@color/colorPrimary"
+                android:rotation="45" />
+            <LinearLayout
+                android:layout_marginTop="20dp"
+                android:orientation="vertical"
+                android:layout_marginRight="10dp"
+                android:layout_marginLeft="10dp"
+                android:layout_width="match_parent"
+                android:gravity="center"
+                android:layout_height="wrap_content">
+                <LinearLayout
+                    android:weightSum="10"
+                    android:layout_margin="5dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+                    <TextView
+                        android:text="Product Base Price "
+                        android:layout_width="1dp"
+                        android:layout_weight="5"
+                        android:layout_height="wrap_content" />
+                    <TextView
+                        android:id="@+id/baseTxt"
+                        android:layout_width="1dp"
+                        android:layout_weight="5"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+                <LinearLayout
+                    android:weightSum="10"
+                    android:layout_margin="5dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+                    <TextView
+                        android:text="Product Offer Price "
+                        android:layout_width="1dp"
+                        android:layout_weight="5"
+                        android:layout_height="wrap_content" />
+                    <TextView
+                        android:id="@+id/discpriceTxt"
+                        android:layout_width="1dp"
+                        android:layout_weight="5"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+                <LinearLayout
+                    android:weightSum="10"
+                    android:layout_margin="5dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+                    <TextView
+                        android:text="Product discount "
+                        android:layout_width="1dp"
+                        android:layout_weight="5"
+                        android:layout_height="wrap_content" />
+                    <TextView
+                        android:id="@+id/discountTxt"
+                        android:layout_width="1dp"
+                        android:layout_weight="5"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+                <LinearLayout
+                    android:weightSum="10"
+                    android:layout_margin="5dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+                    <TextView
+                        android:text="Delivery Charges "
+                        android:layout_width="1dp"
+                        android:layout_weight="5"
+                        android:layout_height="wrap_content" />
+                    <TextView
+                        android:id="@+id/deliveryTxt"
+                        android:layout_width="1dp"
+                        android:layout_weight="5"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+                <LinearLayout
+                    android:weightSum="10"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginRight="5dp"
+                    android:layout_marginLeft="5dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+                    <TextView
+                        android:text="Total Amount "
+                        android:layout_width="1dp"
+                        android:layout_weight="5"
+                        android:textSize="20dp"
+                        android:layout_height="wrap_content" />
+                    <TextView
+                        android:id="@+id/totalTxt"
+                        android:layout_width="1dp"
+                        android:layout_weight="5"
+                        android:textSize="20dp"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:weightSum="10"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginRight="5dp"
+                    android:layout_marginLeft="5dp"
+                    android:gravity="center"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+                    <Button
+                        android:id="@+id/bookBtn"
+                        android:text="Book Your Order"
+                        android:textColor="@color/white"
+                        android:background="@drawable/labelstyle"
+                        android:layout_width="300dp"
+                        android:layout_height="40dp" />
+                </LinearLayout>
+
+            </LinearLayout>
+        </LinearLayout>
+
+
+</LinearLayout>
