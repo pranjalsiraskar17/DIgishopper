@@ -128,15 +128,16 @@
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
+
                 <TextView
-                    android:id="@+id/forgatePass"
+                    android:id="@+id/forgetPass"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:layout_alignParentLeft="true"
                     android:layout_alignParentTop="true"
-                    android:text="Forgate Password"
-                    android:textColor="@color/white"
                     android:layout_marginLeft="20dp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    android:text="Forget Password"
+                    android:textColor="@color/white" />
                 <TextView
                     android:id="@+id/verifyEmail"
                     android:layout_alignParentRight="true"
