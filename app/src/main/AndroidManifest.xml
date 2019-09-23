@@ -28,13 +28,13 @@
             android:label="@string/title_activity_home_drawable"
             android:theme="@style/AppTheme.NoActionBar" />
 
-        <service android:name="com.project.sagar.fcmnotifier.FireIDService"
+        <service android:name="."
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
             </intent-filter>
         </service>
-        <service android:name="com.project.sagar.fcmnotifier.FireBaseMsgService"
+        <service android:name=".FireBaseMsgService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
