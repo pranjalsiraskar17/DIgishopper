@@ -30,6 +30,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.hbb20.CountryCodePicker;
 import com.project.sagar.digishopper.HomeDrawableActivity;
 import com.project.sagar.digishopper.R;
@@ -112,10 +113,15 @@ public class LoginPageFragment extends Fragment {
                                                         if(FirebaseAuth.getInstance().getCurrentUser().isEmailVerified())
                                                         {
                                                             progressDialog.dismiss();
+
+                                                            FirebaseDatabase.getInstance().getReference().child("Users").child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                                                                    .child("user_device_token").setValue(FirebaseInstanceId.getInstance().getToken());
                                                             Toast.makeText(getActivity(), "Login Successful", Toast.LENGTH_SHORT).show();
                                                             Intent loginIntent=new Intent(getActivity(), HomeDrawableActivity.class);
                                                             startActivity(loginIntent);
                                                             getActivity().finish();
+
+
                                                         }else
                                                         {
                                                             progressDialog.dismiss();
