@@ -30,6 +30,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.hbb20.CountryCodePicker;
 import com.project.sagar.digishopper.HomeDrawableActivity;
 import com.project.sagar.digishopper.R;
@@ -37,7 +38,7 @@ import com.project.sagar.digishopper.R;
 public class LoginPageFragment extends Fragment {
     public static final String TAG=LoginPageFragment.class.getSimpleName();
     private Button btn_login,btn_signup;
-    private TextView txt_forgetpass,txtVerifyEmail;
+    private TextView txtforgetpass,txtVerifyEmail;
     private EditText editText_mobile,editText_password;
     private CountryCodePicker mCodePicker;
     private FirebaseAuth firebaseAuth;
@@ -51,6 +52,7 @@ public class LoginPageFragment extends Fragment {
         editText_password=(EditText)v.findViewById(R.id.pass_edittext);
         editText_mobile=(EditText)v.findViewById(R.id.mobile_edittext);
         txtVerifyEmail=v.findViewById(R.id.verifyEmail);
+        txtforgetpass=v.findViewById(R.id.forgetPass);
         mCodePicker=v.findViewById(R.id.codePicker);
         firebaseAuth=FirebaseAuth.getInstance();
         progressDialog=new ProgressDialog(getActivity());
@@ -62,6 +64,12 @@ public class LoginPageFragment extends Fragment {
                 showVerifyEmailFragment();
             }
         });
+        txtforgetpass.setOnClickListener((new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showForgatePassFragment();
+            }
+        }));
         btn_login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -86,15 +94,15 @@ public class LoginPageFragment extends Fragment {
                     query.addValueEventListener(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            String pass="";
+                            String pass=editText_password.getText().toString();
                             String email="";
                             for (DataSnapshot dataSnapshot1:dataSnapshot.getChildren())
                             {
 
-                                if(!TextUtils.isEmpty(String.valueOf(dataSnapshot1.child("user_pass").getValue())))
-                                {
-                                    pass=String.valueOf(dataSnapshot1.child("user_pass").getValue());
-                                }
+//                                if(!TextUtils.isEmpty(String.valueOf(dataSnapshot1.child("user_pass").getValue())))
+//                                {
+//                                    pass=String.valueOf(dataSnapshot1.child("user_pass").getValue());
+//                                }
                                 if(!TextUtils.isEmpty(String.valueOf(dataSnapshot1.child("user_email").getValue())))
                                 {
                                     email=String.valueOf(dataSnapshot1.child("user_email").getValue());
@@ -109,18 +117,47 @@ public class LoginPageFragment extends Fragment {
                                                     @Override
                                                     public void onComplete(@NonNull Task<AuthResult> task) {
 
+                                                        if(FirebaseAuth.getInstance().getCurrentUser()!=null)
+                                                        {
+                                                            if(FirebaseAuth.getInstance().getCurrentUser().isEmailVerified())
+                                                            {
+                                                                progressDialog.dismiss();
+                                                                FirebaseDatabase.getInstance().getReference().child("Users").child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                                                                        .child("user_device_token").setValue(FirebaseInstanceId.getInstance().getToken());
+                                                                Toast.makeText(getActivity(), "Login Successful", Toast.LENGTH_SHORT).show();
+                                                                Intent loginIntent=new Intent(getActivity(), HomeDrawableActivity.class);
+                                                                startActivity(loginIntent);
+                                                                getActivity().finish();
+                                                            }else
+                                                            {
+                                                                progressDialog.dismiss();
+                                                                FirebaseAuth.getInstance().signOut();
+                                                                Toast.makeText(getActivity(), "Email is Not Verified", Toast.LENGTH_SHORT).show();
+                                                            }
                                                         if(FirebaseAuth.getInstance().getCurrentUser().isEmailVerified())
                                                         {
                                                             progressDialog.dismiss();
+
+                                                            FirebaseDatabase.getInstance().getReference().child("Users").child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                                                                    .child("user_device_token").setValue(FirebaseInstanceId.getInstance().getToken());
                                                             Toast.makeText(getActivity(), "Login Successful", Toast.LENGTH_SHORT).show();
                                                             Intent loginIntent=new Intent(getActivity(), HomeDrawableActivity.class);
                                                             startActivity(loginIntent);
                                                             getActivity().finish();
+
+
                                                         }else
                                                         {
                                                             progressDialog.dismiss();
                                                             FirebaseAuth.getInstance().signOut();
                                                             Toast.makeText(getActivity(), "Email is Not Verified", Toast.LENGTH_SHORT).show();
+                                                        }
+
+
+                                                        }else
+                                                        {
+                                                            progressDialog.dismiss();
+                                                            Toast.makeText(getActivity(), "Wrong Password", Toast.LENGTH_SHORT).show();
                                                         }
 
 
@@ -197,6 +234,18 @@ public class LoginPageFragment extends Fragment {
         {
             getFragmentManager().beginTransaction()
                     .replace(R.id.loginContainer,verifyEmailFragment,verifyEmailFragment.TAG)
+                    .addToBackStack(null)
+                    .commit();
+        }
+
+    }
+    private void showForgatePassFragment() {
+        ForgatePassFragment forgetPassFragment=new ForgatePassFragment();
+        if(forgetPassFragment!=null)
+        {
+            getFragmentManager().beginTransaction()
+                    .replace(R.id.loginContainer,forgetPassFragment,forgetPassFragment.TAG)
+                    .addToBackStack(null)
                     .commit();
         }
 

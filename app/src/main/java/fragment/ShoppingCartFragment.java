@@ -34,6 +34,7 @@ public class ShoppingCartFragment extends Fragment {
     public static final String TAG=ShoppingCartFragment.class.getSimpleName();
     private RecyclerView recyclerView_cart;
     public static TextView cart_amount_txt;
+    public TextView txtCartAmt;
     public Button btn_checkout;
     private ArrayList<CartProduct> cartProducts =new ArrayList<>();
     private ShoppingCartAdapter adapter;
@@ -49,6 +50,7 @@ public class ShoppingCartFragment extends Fragment {
         View view=inflater.inflate(R.layout.shopping_cart_layout,container,false);
         recyclerView_cart=view.findViewById(R.id.cart_recyclerview);
         btn_checkout=view.findViewById(R.id.button_checkout);
+        txtCartAmt=view.findViewById(R.id.txtcartamt);
         cart_amount_txt=view.findViewById(R.id.cartamount_txt);
 
         dbr= FirebaseDatabase.getInstance().getReference().child("Users").child(FirebaseAuth.getInstance().getCurrentUser().getUid())
@@ -65,10 +67,21 @@ public class ShoppingCartFragment extends Fragment {
                     cartProducts.add(cp);
 
                 }
-                adapter=new ShoppingCartAdapter(getActivity(),cartProducts);
 
-                recyclerView_cart.setLayoutManager(new LinearLayoutManager(getActivity()));
-                recyclerView_cart.setAdapter(adapter);
+                if(cartProducts.size()>0)
+                {
+                    adapter=new ShoppingCartAdapter(getActivity(),cartProducts);
+
+                    recyclerView_cart.setLayoutManager(new LinearLayoutManager(getActivity()));
+                    recyclerView_cart.setAdapter(adapter);
+                }else
+                {
+                        txtCartAmt.setVisibility(View.GONE);
+                        cart_amount_txt.setVisibility(View.GONE);
+                        recyclerView_cart.setVisibility(View.GONE);
+                    btn_checkout.setVisibility(View.GONE);
+                }
+
 
 
             }
