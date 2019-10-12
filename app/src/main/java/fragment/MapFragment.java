@@ -29,19 +29,17 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.PendingResult;
-import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.common.api.Status;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.LocationSettingsRequest;
-import com.google.android.gms.location.LocationSettingsResult;
-import com.google.android.gms.location.LocationSettingsStatusCodes;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.project.sagar.digishopper.HomeDrawableActivity;
 import com.project.sagar.digishopper.R;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -55,10 +53,12 @@ public class MapFragment extends Fragment implements LocationListener {
     protected static final int REQUEST_CHECK_SETTINGS = 0x1;
     private LocationManager mLocationManager;
     private TextInputEditText txt_name,txt_mobile,txt_add1,txt_add2, txt_street_locality, txt_landmarkTxt, txt_pinTxt, txt_district;
-    private Button isDeliverable,btnCheckout;
+    private Button btnCheckout;
     String address="",prdid="",parentFrag="";
     public HashMap<String, ArrayList<String>> cartmap=new HashMap<>();
     int qty;
+    DatabaseReference dbr;
+    String uid;
 
     @TargetApi(Build.VERSION_CODES.P)
     @Nullable
@@ -73,8 +73,75 @@ public class MapFragment extends Fragment implements LocationListener {
         txt_landmarkTxt = (TextInputEditText) view.findViewById(R.id.landmarkTxt);
         txt_pinTxt = (TextInputEditText) view.findViewById(R.id.pinTxt);
         txt_district = (TextInputEditText) view.findViewById(R.id.districtTxt);
-        isDeliverable=(Button)view.findViewById(R.id.btn);
+
         btnCheckout=(Button)view.findViewById(R.id.button_buy);
+        uid= FirebaseAuth.getInstance().getCurrentUser().getUid();
+        dbr= FirebaseDatabase.getInstance().getReference().child("Users").child(uid);
+
+        dbr.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(dataSnapshot.child("user_fname").getValue()!=null)
+                {
+                    String fname=dataSnapshot.child("user_fname").getValue().toString();
+                    if(dataSnapshot.child("user_lname").getValue()!=null)
+                    {
+                        String lname=dataSnapshot.child("user_lname").getValue().toString();
+                        txt_name.setText(fname+" "+lname);
+                    }
+                }
+
+                if(dataSnapshot.child("user_phone_number").getValue()!=null)
+                {
+                    String mobile=dataSnapshot.child("user_phone_number").getValue().toString();
+                    txt_mobile.setText(mobile);
+                }
+
+                if(dataSnapshot.child("user_address").child("add1").getValue()!=null)
+                {
+                    txt_add1.setText(dataSnapshot.child("user_address").child("add1").getValue().toString());
+                }
+
+
+                if(dataSnapshot.child("user_address").child("add2").getValue()!=null)
+                {
+                    txt_add2.setText(dataSnapshot.child("user_address").child("add2").getValue().toString());
+                }
+
+
+                if(dataSnapshot.child("user_address").child("street_locality").getValue()!=null)
+                {
+                    txt_street_locality.setText(dataSnapshot.child("user_address").child("street_locality").getValue().toString());
+                }
+
+
+                if(dataSnapshot.child("user_address").child("landmark").getValue()!=null)
+                {
+                    txt_landmarkTxt.setText(dataSnapshot.child("user_address").child("landmark").getValue().toString());
+                }
+
+
+                if(dataSnapshot.child("user_address").child("district").getValue()!=null)
+                {
+                    txt_district.setText(dataSnapshot.child("user_address").child("district").getValue().toString());
+                }
+
+
+                if(dataSnapshot.child("user_address").child("pin").getValue()!=null)
+                {
+                    txt_pinTxt.setText(dataSnapshot.child("user_address").child("pin").getValue().toString());
+                }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+
+
 
         Bundle bundle=getArguments();
         if(bundle!=null)
@@ -83,34 +150,59 @@ public class MapFragment extends Fragment implements LocationListener {
            if(parentFrag.equals("cart"))
            {
                cartmap=(HashMap<String, ArrayList<String>>) bundle.getSerializable("cartmap");
-           }else
+           }
+           else if(parentFrag.equals("prdhome1"))
+           {
+               btnCheckout.setText("Add Adddress");
+           }
+           else
            {
                prdid=bundle.getString("prdidToAddress");
                qty=bundle.getInt("qty");
            }
         }
 
-        mLocationManager = (LocationManager) getActivity().getSystemService(LOCATION_SERVICE);
+        btnCheckout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
 
-//        if (getActivity().checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && getActivity().checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-//            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 1);
-//
-//        }
-//        if (!mLocationManager.isLocationEnabled()) {
-//            displayLocationSettingsRequest(getActivity());
-//        }
-//            if (mLocationManager.isLocationEnabled()) {
-//                Location location = mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-//                if(location!=null)
-//                {
-//                    onLocationChanged(location);
-//                }
-//
-//            }
+                if(btnCheckout.getText().equals("Add Adddress"))
+                {
 
-            isDeliverable.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
+                    if(txt_add1.getText()!=null)
+                    {
+                        dbr.child("user_address").child("add1").setValue(txt_add1.getText().toString());
+                    }
+                    if(txt_add2.getText()!=null)
+                    {
+                        dbr.child("user_address").child("add2").setValue(txt_add2.getText().toString());
+                    }
+                    if(txt_street_locality.getText()!=null)
+                    {
+                        dbr.child("user_address").child("street_locality").setValue(txt_street_locality.getText().toString());
+                    }
+                    if(txt_landmarkTxt.getText()!=null)
+                    {
+                        dbr.child("user_address").child("landmark").setValue(txt_landmarkTxt.getText().toString());
+                    }
+                    if(txt_pinTxt.getText()!=null)
+                    {
+                        dbr.child("user_address").child("pin").setValue(txt_pinTxt.getText().toString());
+                    }
+                    if(txt_district.getText()!=null)
+                    {
+                        dbr.child("user_address").child("district").setValue(txt_district.getText().toString()).addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                Toast.makeText(getActivity(), "address added Successfully", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }else
+                    {
+                        txt_district.setError("District value can't be null");
+                    }
+
+                }else{
                     address="";
                     if(!TextUtils.isEmpty(txt_add1.getText()))
                         address+=txt_add1.getText();
@@ -143,7 +235,21 @@ public class MapFragment extends Fragment implements LocationListener {
                         if(isDeliverableStatus(main_latitude,main_longitude,latitude,longitude))
                         {
                             Toast.makeText(getActivity(), "Delivery Available", Toast.LENGTH_SHORT).show();
-                            btnCheckout.setEnabled(true);
+                            if(parentFrag.equals("cart"))
+                            {
+                                ((HomeDrawableActivity)getActivity()).showProductBillFragment(cartmap,address,txt_name.getText().toString(),txt_mobile.getText().toString());
+
+                            }else
+                            {
+                                ArrayList<String>prdlist=new ArrayList<>();
+                                ArrayList<String>qtylist=new ArrayList<>();
+                                prdlist.add(prdid);
+                                qtylist.add(String.valueOf(qty));
+                                HashMap<String,ArrayList<String>> map=new HashMap<String, ArrayList<String>>();
+                                map.put("prd",prdlist);
+                                map.put("qty",qtylist);
+                                ((HomeDrawableActivity)getActivity()).showProductBillFragment(map,address,txt_name.getText().toString(),txt_mobile.getText().toString());
+                            }
                         }else
                         {
                             Toast.makeText(getActivity(), "Delivery Not Available", Toast.LENGTH_SHORT).show();
@@ -154,27 +260,15 @@ public class MapFragment extends Fragment implements LocationListener {
                         e.printStackTrace();
                     }
                 }
-            });
 
 
-        btnCheckout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(parentFrag.equals("cart"))
-                {
-                    ((HomeDrawableActivity)getActivity()).showProductBillFragment(cartmap,address,txt_name.getText().toString(),txt_mobile.getText().toString());
 
-                }else
-                {
-                    ArrayList<String>prdlist=new ArrayList<>();
-                    ArrayList<String>qtylist=new ArrayList<>();
-                    prdlist.add(prdid);
-                    qtylist.add(String.valueOf(qty));
-                    HashMap<String,ArrayList<String>> map=new HashMap<String, ArrayList<String>>();
-                    map.put("prd",prdlist);
-                    map.put("qty",qtylist);
-                    ((HomeDrawableActivity)getActivity()).showProductBillFragment(map,address,txt_name.getText().toString(),txt_mobile.getText().toString());
-                }
+
+
+
+
+
+
 
             }
         });
@@ -276,47 +370,6 @@ public class MapFragment extends Fragment implements LocationListener {
 
     }
 
-    private void displayLocationSettingsRequest(Context context) {
-        GoogleApiClient googleApiClient = new GoogleApiClient.Builder(context)
-                .addApi(LocationServices.API).build();
-        googleApiClient.connect();
-
-        LocationRequest locationRequest = LocationRequest.create();
-        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        locationRequest.setInterval(10000);
-        locationRequest.setFastestInterval(10000 / 2);
-
-        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder().addLocationRequest(locationRequest);
-        builder.setAlwaysShow(true);
-
-        PendingResult<LocationSettingsResult> result = LocationServices.SettingsApi.checkLocationSettings(googleApiClient, builder.build());
-        result.setResultCallback(new ResultCallback<LocationSettingsResult>() {
-            @Override
-            public void onResult(LocationSettingsResult result) {
-                final Status status = result.getStatus();
-                switch (status.getStatusCode()) {
-                    case LocationSettingsStatusCodes.SUCCESS:
-                        Log.i(TAG, "All location settings are satisfied.");
-
-                        break;
-                    case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
-                        Log.i(TAG, "Location settings are not satisfied. Show the user a dialog to upgrade location settings ");
-
-                        try {
-                            // Show the dialog by calling startResolutionForResult(), and check the result
-                            // in onActivityResult().
-                            status.startResolutionForResult(getActivity(), REQUEST_CHECK_SETTINGS);
-                        } catch (IntentSender.SendIntentException e) {
-                            Log.i(TAG, "PendingIntent unable to execute request.");
-                        }
-                        break;
-                    case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
-                        Log.i(TAG, "Location settings are inadequate, and cannot be fixed here. Dialog not created.");
-                        break;
-                }
-            }
-        });
-    }
 
 
 }

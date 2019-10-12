@@ -1,6 +1,9 @@
 package fragment;
 
+import android.app.ProgressDialog;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,7 +27,13 @@ import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 import com.project.sagar.digishopper.HomeDrawableActivity;
 import com.project.sagar.digishopper.R;
+import com.project.sagar.fcmnotifier.FCMNotifier;
 
+import org.json.JSONObject;
+
+import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -34,10 +43,15 @@ public class ProductBillFragment extends Fragment {
     Button bookBtn;
     HashMap<String,ArrayList<String>> map=new HashMap<>();
     String address,name,mobile;
+    DatabaseReference txnRef;
     int base,selling;
     ArrayList<String> prdidlist=new ArrayList<>();
     ArrayList<String> qtylist=new ArrayList<>();
+    int txnid;
     int j;
+    String token="",msg="";
+    ProgressDialog progressDialog;
+    Boolean isCompleted=false;
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -49,6 +63,28 @@ public class ProductBillFragment extends Fragment {
         deliveryPrice=(TextView)view.findViewById(R.id.deliveryTxt);
         bookBtn=(Button)view.findViewById(R.id.bookBtn);
         Bundle bundle=getArguments();
+
+
+
+        FirebaseDatabase.getInstance().getReference().child("merchant_token_id").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(dataSnapshot.getValue()!=null)
+                {
+                    token=dataSnapshot.getValue().toString();
+
+                }
+
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+
         if(bundle!=null)
         {
             map= (HashMap<String, ArrayList<String>>) bundle.getSerializable("prdmap");
@@ -86,19 +122,28 @@ public class ProductBillFragment extends Fragment {
         bookBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                progressDialog=new ProgressDialog(getActivity());
+                progressDialog.setTitle("Please Wait...");
+                progressDialog.setMessage("Product booking processing...");
+                progressDialog.setCanceledOnTouchOutside(false);
+                progressDialog.show();
                 final DatabaseReference txtCounterRef=FirebaseDatabase.getInstance().getReference().child("txtCounter");
                 txtCounterRef.addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                 final String userKey= FirebaseAuth.getInstance().getCurrentUser().getUid();
                                 final DatabaseReference cartref=FirebaseDatabase.getInstance().getReference().child("Users").child(userKey).child("Mycart");
-                                final int txnid=Integer.parseInt(dataSnapshot.getValue().toString())+1;
-                                final DatabaseReference txnRef=FirebaseDatabase.getInstance().getReference().child("Orders").child("TXN"+txnid);
+                                txnid=Integer.parseInt(dataSnapshot.getValue().toString())+1;
+                                txnRef=FirebaseDatabase.getInstance().getReference().child("Orders").child("TXN"+txnid);
                                 txnRef.child("txn_id").setValue("TXN"+txnid);
+                                txnRef.child("txt_amt").setValue(Integer.parseInt(String.valueOf(base)));
                                 txnRef.child("order_address").setValue(address);
+                                txnRef.child("order_status").setValue("ordered");
                                 txnRef.child("buyer_name").setValue(name);
                                 txnRef.child("buyer_phone").setValue(mobile);
                                 txnRef.child("buyer_userkey").setValue(userKey);
+                                txnRef.child("txn_timestamp").setValue(ServerValue.TIMESTAMP);
+
                                 for(j=0;j<prdidlist.size();j++)
                                 {
 
@@ -108,11 +153,18 @@ public class ProductBillFragment extends Fragment {
                                             .child("ProductInfo").child(id).addListenerForSingleValueEvent(new ValueEventListener() {
                                         @Override
                                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                            txnRef.child(id).child("product_price").setValue(dataSnapshot.child("product_selling_price").toString());
+                                            txnRef.child(id).child("product_price").setValue(dataSnapshot.child("product_selling_price").getValue().toString());
                                             txnRef.child(id).child("prd_id").setValue(id);
-                                            txnRef.child(id).child("order_status").setValue("ordered");
-                                            txnRef.child(id).child("product_qty").setValue(qty);
-                                            txnRef.child(id).child("txn_timestamp").setValue(ServerValue.TIMESTAMP)
+                                            if(msg.length()>0)
+                                            {
+                                                msg+=","+dataSnapshot.child("product_name").getValue().toString();
+                                            }
+                                            else
+                                            {
+                                                msg+=dataSnapshot.child("product_name").getValue().toString();
+                                            }
+
+                                            txnRef.child(id).child("product_qty").setValue(qty)
                                                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                                                         @Override
                                                         public void onSuccess(Void aVoid) {
@@ -126,8 +178,28 @@ public class ProductBillFragment extends Fragment {
                                                                         @Override
                                                                         public void onComplete(@NonNull Task<Void> task) {
 
-                                                                            Toast.makeText(getActivity(), "Booking Done !", Toast.LENGTH_SHORT).show();
-                                                                            ((HomeDrawableActivity)getActivity()).removeAllFragment();
+                                                                                progressDialog.dismiss();
+                                                                                Toast.makeText(getActivity(), "Booking Done !", Toast.LENGTH_SHORT).show();
+                                                                                ((HomeDrawableActivity)getActivity()).removeAllFragment();
+                                                                                if(!isCompleted)
+                                                                                {
+//                                                                                    new Notify().execute();
+                                                                                    FCMNotifier notifier=new FCMNotifier("AIzaSyCvSWo7HKk0XFC69J9QQTtCovkWzHcKm0M",token);
+                                                                                    notifier.setTitle("New Order");
+                                                                                    notifier.setMsg("You have order of "+msg);
+                                                                                    if(notifier.send())
+                                                                                    {
+                                                                                        Toast.makeText(getActivity(), "Done", Toast.LENGTH_SHORT).show();
+                                                                                    }else
+                                                                                    {
+                                                                                        Toast.makeText(getActivity(), "Failed", Toast.LENGTH_SHORT).show();
+
+                                                                                    }
+                                                                                    //notifier.send();
+
+
+                                                                                    isCompleted=true;
+                                                                                }
 
                                                                         }
                                                                     });
@@ -162,9 +234,78 @@ public class ProductBillFragment extends Fragment {
 
                             }
                         });
+
+                final DatabaseReference nftCounter=FirebaseDatabase.getInstance().getReference().child("nftCounter");
+                nftCounter.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        final String userKey= FirebaseAuth.getInstance().getCurrentUser().getUid();
+                        final int nftid=Integer.parseInt(dataSnapshot.getValue().toString())+1;
+                        DatabaseReference nftRef=FirebaseDatabase.getInstance().getReference().child("Notifications").child("Merchant").child("NFT"+nftid);
+                        nftRef.child("txn_id").setValue("TXN"+txnid);
+                        nftRef.child("order_type").setValue("Ordered");
+                        nftRef.child("txn_timestamp").setValue(ServerValue.TIMESTAMP);
+                        nftRef.child("buyer_userkey").setValue(userKey).addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                nftCounter.setValue(nftid);
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                            }
+                        });
             }
         });
 
         return view;
+    }
+
+    public class Notify extends AsyncTask<Void,Void,Void> {
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+
+
+            try {
+
+                URL url = new URL("https://fcm.googleapis.com/fcm/send");
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+
+                conn.setUseCaches(false);
+                conn.setDoInput(true);
+                conn.setDoOutput(true);
+
+                conn.setRequestMethod("POST");
+                conn.setRequestProperty("Authorization","key=AIzaSyCvSWo7HKk0XFC69J9QQTtCovkWzHcKm0M");
+                conn.setRequestProperty("Content-Type", "application/json");
+
+                JSONObject json = new JSONObject();
+
+
+                json.put("to", token);
+
+
+                JSONObject info = new JSONObject();
+                info.put("title", "New Order");   // Notification title
+                info.put("body", "You have order of "+msg); // Notification body
+                json.put("notification", info);
+
+                OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
+                wr.write(json.toString());
+                wr.flush();
+                conn.getInputStream();
+
+            } catch (Exception e) {
+                Log.d("Error", "" + e);
+            }
+
+
+            return null;
+        }
+
     }
 }

@@ -40,6 +40,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.hbb20.CountryCodePicker;
 import com.project.sagar.digishopper.HomeDrawableActivity;
 import com.project.sagar.digishopper.LoginActivity;
@@ -496,6 +497,7 @@ public class VerifyMobileFragment extends Fragment {
                         userDatabasereference.child("user_fname").setValue(fname);
                         userDatabasereference.child("user_lname").setValue(lname);
                         userDatabasereference.child("user_pass").setValue(pass);
+                        userDatabasereference.child("user_device_token").setValue(FirebaseInstanceId.getInstance().getToken());
                         if(!TextUtils.isEmpty(email))
                         {
                             userDatabasereference.child("user_email").setValue(email);

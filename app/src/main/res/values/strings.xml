@@ -9,6 +9,7 @@
     <string name="action_settings">Settings</string>
 
     <string name="menu_myorders">My Orders</string>
+    <string name="menu_home">Home</string>
     <string name="menu_notifications">Notifications</string>
     <string name="menu_mywishlist">My Wish List</string>
     <string name="menu_myaccount">My Account</string>
