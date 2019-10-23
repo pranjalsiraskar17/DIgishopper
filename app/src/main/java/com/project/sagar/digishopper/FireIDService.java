@@ -45,6 +45,6 @@ public class FireIDService extends FirebaseMessagingService {
         NotificationManager notificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-        notificationManager.notify(1410 /* ID of notification */, notificationBuilder.build());
+        notificationManager.notify(1410 /* ID of notification_fragment */, notificationBuilder.build());
     }
 }

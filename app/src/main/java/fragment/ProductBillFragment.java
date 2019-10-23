@@ -47,11 +47,15 @@ public class ProductBillFragment extends Fragment {
     int base,selling;
     ArrayList<String> prdidlist=new ArrayList<>();
     ArrayList<String> qtylist=new ArrayList<>();
-    int txnid;
+    int txnid,nftid,nftcounter;
     int j;
     String token="",msg="";
     ProgressDialog progressDialog;
     Boolean isCompleted=false;
+
+    public ProductBillFragment() {
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -169,6 +173,25 @@ public class ProductBillFragment extends Fragment {
                                                         @Override
                                                         public void onSuccess(Void aVoid) {
                                                             txtCounterRef.setValue(txnid);
+                                                            final DatabaseReference nftCounterRef=FirebaseDatabase.getInstance().getReference().child("NftCounter");
+                                                            nftCounterRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                                                @Override
+                                                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                                   nftid =Integer.parseInt(dataSnapshot.getValue().toString());
+                                                                   nftcounter=nftid+1;
+                                                                    DatabaseReference nftRef=FirebaseDatabase.getInstance().getReference().child("Users").child(userKey).child("Notification").child("NFT"+nftcounter);
+                                                                    nftRef.child("order_status").setValue("ordered");
+                                                                    nftRef.child("nft_timestamp").setValue(ServerValue.TIMESTAMP);
+                                                                    nftCounterRef.setValue(nftcounter);
+                                                                }
+
+                                                                @Override
+                                                                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                                                }
+                                                            });
+
+                                                        //    nftRef.child("nft_id").setValue("NFT"+nftid);
                                                             DatabaseReference odersRef=FirebaseDatabase.getInstance().getReference().child("Users").child(userKey).child("Myorders").child("TXN"+txnid);
                                                             odersRef.child("order_status").setValue("ordered");
                                                             odersRef.child("txn_id").setValue("TXN"+txnid).addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -290,9 +313,9 @@ public class ProductBillFragment extends Fragment {
 
 
                 JSONObject info = new JSONObject();
-                info.put("title", "New Order");   // Notification title
-                info.put("body", "You have order of "+msg); // Notification body
-                json.put("notification", info);
+                info.put("title", "New Order");   // NotificationFragment title
+                info.put("body", "You have order of "+msg); // NotificationFragment body
+                json.put("notification_fragment", info);
 
                 OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
                 wr.write(json.toString());
