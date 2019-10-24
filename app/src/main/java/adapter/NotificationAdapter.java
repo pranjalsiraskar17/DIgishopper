@@ -42,8 +42,18 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
     public void onBindViewHolder(@NonNull NotificationViewholder holder, int position) {
         Date date=new Date(notificationClasses.get(position).getTimestamp());
         holder.nft_timestamp.setText(String.valueOf( new SimpleDateFormat("dd-MM-yyyy").format(date)));
-        holder.notification.setText("Your order is "+notificationClasses.get(position).getOrder_status());
-
+        if(notificationClasses.get(position).getOrder_status().equals("ordered")){
+            holder.notification.setText("Your order is waiting to accept by shopkeeper");
+        }
+        else  if (notificationClasses.get(position).getOrder_status().equals("Delivering")){
+            holder.notification.setText("Your order is on the way");
+        }
+        else  if (notificationClasses.get(position).getOrder_status().equals("Delivered")){
+            holder.notification.setText("Your order is delivered successfully");
+        }
+        else  if (notificationClasses.get(position).getOrder_status().equals("Rejected")){
+            holder.notification.setText("Your order is rejected by shopkeeper");
+        }
 
     }
 
