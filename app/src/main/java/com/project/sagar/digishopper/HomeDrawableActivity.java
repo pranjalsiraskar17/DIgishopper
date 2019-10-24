@@ -80,6 +80,7 @@ import fragment.LoginPageFragment;
 import fragment.MapFragment;
 import fragment.MyAccountFragment;
 import fragment.MyOrderFragment;
+import fragment.NotificationFragment;
 import fragment.ProductBillFragment;
 import fragment.SearchProductFragment;
 import fragment.ShoppingCartFragment;
@@ -298,7 +299,7 @@ public class HomeDrawableActivity extends AppCompatActivity
     private void showShoppingCartFragment() {
         if(getSupportFragmentManager().findFragmentByTag(ShoppingCartFragment.TAG)==null )
         {
-            ShoppingCartFragment shoppingCartFragment=new ShoppingCartFragment();
+            NotificationFragment shoppingCartFragment=new NotificationFragment();
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.productHomeContainer,shoppingCartFragment,shoppingCartFragment.TAG)
                     .addToBackStack(null)

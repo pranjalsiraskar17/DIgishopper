@@ -20,9 +20,9 @@ import com.google.firebase.database.ValueEventListener;
 import com.project.sagar.digishopper.MyProductInOrderClass;
 import com.project.sagar.digishopper.R;
 import com.squareup.picasso.Picasso;
+import java.util.ArrayList;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 
 public class MyProductInOrderAdapter extends RecyclerView.Adapter<MyProductInOrderAdapter.MyProductInOrderViewHolder> {

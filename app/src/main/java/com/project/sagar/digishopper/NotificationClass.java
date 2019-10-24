@@ -1,12 +1,13 @@
 package com.project.sagar.digishopper;
 
 public class NotificationClass {
-    public String order_status,timestamp;
+    public String order_status;
+    public long timestamp;
 
     public NotificationClass(){
 
     }
-    public NotificationClass(String order_status,String timestamp){
+    public NotificationClass(String order_status,long timestamp){
         this.order_status=order_status;
         this.timestamp=timestamp;
     }
@@ -15,9 +16,9 @@ public class NotificationClass {
 
     public void setOrder_status(String order_status){this.order_status=order_status;}
 
-    public String getTimestamp(){return timestamp;}
+    public long getTimestamp(){return timestamp;}
 
-    public void setTimestamp(String timestamp){this.timestamp=timestamp;}
+    public void setTimestamp(long timestamp){this.timestamp=timestamp;}
 
 
 }
