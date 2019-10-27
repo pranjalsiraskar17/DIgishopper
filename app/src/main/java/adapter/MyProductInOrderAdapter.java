@@ -48,9 +48,7 @@ public class MyProductInOrderAdapter extends RecyclerView.Adapter<MyProductInOrd
     public void onBindViewHolder(@NonNull final MyProductInOrderViewHolder holder, int position) {
         holder.product_id.setText(myProductInOrderClassArrayList.get(position).getPrd_id());
         holder.product_qty.setText(String.valueOf(myProductInOrderClassArrayList.get(position).getProduct_qty()));
-        holder.order_status.setText(myProductInOrderClassArrayList.get(position).getOrder_status()+" on");
-        Date date=new Date(myProductInOrderClassArrayList.get(position).getTxn_timestamp());
-        holder.order_time.setText(String.valueOf( new SimpleDateFormat("dd-MM-yyyy").format(date)));
+        holder.order_time.setText(String.valueOf(myProductInOrderClassArrayList.get(position).getProduct_price()));
         DatabaseReference productInfo= FirebaseDatabase.getInstance().getReference().child("ProductInfo").child(myProductInOrderClassArrayList.get(position).getPrd_id());
         productInfo.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -79,8 +77,7 @@ public class MyProductInOrderAdapter extends RecyclerView.Adapter<MyProductInOrd
             super(itemView);
             product_id=itemView.findViewById(R.id.product_id_value);
             product_qty=itemView.findViewById(R.id.product_qty);
-            order_status=itemView.findViewById(R.id.order_status_value);
-            order_time=itemView.findViewById(R.id.order_time_value);
+            order_time=itemView.findViewById(R.id.prd_price_value);
             imageView=itemView.findViewById(R.id.imageOrder);
         }
     }

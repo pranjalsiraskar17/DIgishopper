@@ -18,6 +18,8 @@ import java.util.ArrayList;
 
 import fragment.MyProductInOrderFragment;
 
+import static com.project.sagar.digishopper.LastSeenTime.getTimeAgo;
+
 public class MyOrderAdapter extends RecyclerView.Adapter<MyOrderAdapter.MyOrderViewholder> {
     Context context;
     ArrayList<MyOrderClass> myOrderClasses;
@@ -44,6 +46,7 @@ public class MyOrderAdapter extends RecyclerView.Adapter<MyOrderAdapter.MyOrderV
         holder.order_id_value.setText(myOrderClasses.get(position).getTxn_id());
         holder.txn_amt.setText(String.valueOf(myOrderClasses.get(position).getTxt_amt()));
         holder.order_status_value.setText(myOrderClasses.get(position).getOrder_status());
+        holder.txn_time.setText(getTimeAgo(myOrderClasses.get(position).getTxn_timestamp(),context));
         holder.layout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -68,7 +71,7 @@ public class MyOrderAdapter extends RecyclerView.Adapter<MyOrderAdapter.MyOrderV
     }
 
     public class MyOrderViewholder extends RecyclerView.ViewHolder {
-        TextView order_id,order_id_value,order_status,order_status_value,txn_amt;
+        TextView order_id,order_id_value,order_status,order_status_value,txn_amt,txn_time;
         LinearLayout layout;
         public MyOrderViewholder(@NonNull View itemView) {
             super(itemView);
@@ -78,6 +81,7 @@ public class MyOrderAdapter extends RecyclerView.Adapter<MyOrderAdapter.MyOrderV
             order_status=itemView.findViewById(R.id.order_status);
             order_status_value=itemView.findViewById(R.id.order_status_value);
             txn_amt=itemView.findViewById(R.id.order_amount_value);
+            txn_time=itemView.findViewById(R.id.txn_time);
         }
     }
 }

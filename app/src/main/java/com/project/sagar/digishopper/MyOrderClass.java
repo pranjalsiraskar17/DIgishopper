@@ -3,15 +3,17 @@ package com.project.sagar.digishopper;
 public class MyOrderClass {
     public String prd_id,txn_id,order_status;
     int txt_amt;
+    long txn_timestamp;
 
     public MyOrderClass(){
     }
 
-    public MyOrderClass(String prd_id, String txn_id, String order_status, int txt_amt) {
+    public MyOrderClass(String prd_id, String txn_id, String order_status, int txt_amt,long txn_timestamp) {
         this.prd_id = prd_id;
         this.txn_id = txn_id;
         this.order_status = order_status;
         this.txt_amt = txt_amt;
+        this.txn_timestamp=txn_timestamp;
     }
 
     public String getPrd_id() {
@@ -45,4 +47,6 @@ public class MyOrderClass {
     public void setTxt_amt(int txt_amt) {
         this.txt_amt = txt_amt;
     }
+
+    public long getTxn_timestamp(){return txn_timestamp;}
 }

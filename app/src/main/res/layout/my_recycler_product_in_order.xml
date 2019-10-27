@@ -79,13 +79,14 @@
                     android:orientation="horizontal"
                     android:layout_margin="5dp">
                     <TextView
-                        android:id="@+id/order_status_value"
+                        android:id="@+id/prd_price"
+                        android:text="Product Price: "
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_margin="2dp"
                         android:textSize="14dp" />
                     <TextView
-                        android:id="@+id/order_time_value"
+                        android:id="@+id/prd_price_value"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_margin="2dp"
@@ -93,6 +94,7 @@
 
                 </LinearLayout>
             </LinearLayout>
+
 
             <ImageView
                 android:id="@+id/imageOrder"

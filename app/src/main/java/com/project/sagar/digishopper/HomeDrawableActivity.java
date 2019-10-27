@@ -292,6 +292,10 @@ public class HomeDrawableActivity extends AppCompatActivity
             showShoppingCartFragment();
             return true;
         }
+        else if (id == R.id.notification_menu) {
+            showNotificationFagment();
+            return true;
+        }
 
         return super.onOptionsItemSelected(item);
     }
@@ -299,7 +303,7 @@ public class HomeDrawableActivity extends AppCompatActivity
     private void showShoppingCartFragment() {
         if(getSupportFragmentManager().findFragmentByTag(ShoppingCartFragment.TAG)==null )
         {
-            NotificationFragment shoppingCartFragment=new NotificationFragment();
+            ShoppingCartFragment shoppingCartFragment=new ShoppingCartFragment();
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.productHomeContainer,shoppingCartFragment,shoppingCartFragment.TAG)
                     .addToBackStack(null)
@@ -309,6 +313,25 @@ public class HomeDrawableActivity extends AppCompatActivity
             ShoppingCartFragment shoppingCartFragment=(ShoppingCartFragment)getSupportFragmentManager().findFragmentByTag(ShoppingCartFragment.TAG);
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.productHomeContainer,shoppingCartFragment,shoppingCartFragment.TAG)
+                    .addToBackStack(null)
+                    .commit();
+
+
+        }
+    }
+    private void showNotificationFagment() {
+        if(getSupportFragmentManager().findFragmentByTag(NotificationFragment.TAG)==null )
+        {
+            NotificationFragment notificationFragment=new NotificationFragment();
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.productHomeContainer,notificationFragment,notificationFragment.TAG)
+                    .addToBackStack(null)
+                    .commit();
+        }else
+        {
+            NotificationFragment notificationFragment=(NotificationFragment) getSupportFragmentManager().findFragmentByTag(NotificationFragment.TAG);
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.productHomeContainer,notificationFragment,notificationFragment.TAG)
                     .addToBackStack(null)
                     .commit();
 

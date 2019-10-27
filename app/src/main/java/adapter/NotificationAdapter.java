@@ -18,6 +18,8 @@ import java.util.ArrayList;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import static com.project.sagar.digishopper.LastSeenTime.getTimeAgo;
+
 
 public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapter.NotificationViewholder> {
     Context context;
@@ -40,8 +42,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
 
     @Override
     public void onBindViewHolder(@NonNull NotificationViewholder holder, int position) {
-        Date date=new Date(notificationClasses.get(position).getTimestamp());
-        holder.nft_timestamp.setText(String.valueOf( new SimpleDateFormat("dd-MM-yyyy").format(date)));
+        holder.nft_timestamp.setText(getTimeAgo(notificationClasses.get(position).getTimestamp(),context));
         if(notificationClasses.get(position).getOrder_status().equals("ordered")){
             holder.notification.setText("Your order is waiting to accept by shopkeeper");
         }
