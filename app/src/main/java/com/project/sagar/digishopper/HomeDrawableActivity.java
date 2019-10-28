@@ -91,17 +91,18 @@ import retrofit2.Response;
 public class HomeDrawableActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, LocationListener {
     private RecyclerView product_recyclerView;
-    private DatabaseReference productRef;
+    private DatabaseReference productRef,nftBadgeRef;
     private ProductAdapter adapter;
     private ViewFlipper flipper;
     private float startX;
+    int new_nft=0;
     private float startY;
     private int CLICK_ACTION_THRESHOLD = 200;
     private ArrayList<AllProduct> productsList=new ArrayList<AllProduct>();
     private TextView username;
     FirebaseUser user;
     EditText productSearchBar;
-    TextView txtLocation;
+    TextView txtLocation,textCartItemCount;
     LocationManager locationManager;
     ProgressDialog progressDialog;
     @Override
@@ -119,7 +120,8 @@ public class HomeDrawableActivity extends AppCompatActivity
 
         final ArrayList<String> imageList=new ArrayList<>();
         user=FirebaseAuth.getInstance().getCurrentUser();
-
+        final String user_key= FirebaseAuth.getInstance().getCurrentUser().getUid();
+        nftBadgeRef= FirebaseDatabase.getInstance().getReference().child("Users").child(user_key).child("Notification");
         final DatabaseReference dbruser=FirebaseDatabase.getInstance().getReference().child("Users").child(user.getUid());
         dbruser.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -277,7 +279,64 @@ public class HomeDrawableActivity extends AppCompatActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.home_drawable, menu);
+
+        final View actionView = menu.findItem(R.id.notification_menu).getActionView();
+        textCartItemCount = (TextView) actionView.findViewById(R.id.badge);
+        final MenuItem menuItem = menu.findItem(R.id.notification_menu);
+        nftBadgeRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
+                    NotificationClass notificationClass = postSnapshot.getValue(NotificationClass.class);
+                    String isViewed=notificationClass.getIsViewed();
+                    if(isViewed.equals("false")){
+                        new_nft=new_nft+1;
+                    }
+                }
+                setupBadge();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+        actionView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                textCartItemCount.setVisibility(View.GONE);
+                nftBadgeRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
+                            postSnapshot.child("isViewed").getRef().setValue("true");
+                        }
+                    }
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+                onOptionsItemSelected(menuItem);
+            }
+        });
+
         return true;
+    }
+    private void setupBadge() {
+
+        if (textCartItemCount != null) {
+            if (new_nft == 0) {
+                if (textCartItemCount.getVisibility() != View.GONE) {
+                    textCartItemCount.setVisibility(View.GONE);
+                }
+            } else {
+                textCartItemCount.setText(String.valueOf(Math.min(new_nft, 99)));
+                if (textCartItemCount.getVisibility() != View.VISIBLE) {
+                    textCartItemCount.setVisibility(View.VISIBLE);
+                }
+            }
+        }
     }
 
     @Override
@@ -299,6 +358,8 @@ public class HomeDrawableActivity extends AppCompatActivity
 
         return super.onOptionsItemSelected(item);
     }
+
+
 
     private void showShoppingCartFragment() {
         if(getSupportFragmentManager().findFragmentByTag(ShoppingCartFragment.TAG)==null )
@@ -337,6 +398,7 @@ public class HomeDrawableActivity extends AppCompatActivity
 
 
         }
+
     }
 
 

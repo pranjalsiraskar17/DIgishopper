@@ -48,6 +48,7 @@ public class ProductBillFragment extends Fragment {
     ArrayList<String> prdidlist=new ArrayList<>();
     ArrayList<String> qtylist=new ArrayList<>();
     int txnid,nftid,nftcounter;
+    String merchantkey="LmMMtotcU5TphTDMtLVxBbrJRfC2";
     int j;
     String token="",msg="";
     ProgressDialog progressDialog;
@@ -180,8 +181,14 @@ public class ProductBillFragment extends Fragment {
                                                                    nftid =Integer.parseInt(dataSnapshot.getValue().toString());
                                                                    nftcounter=nftid+1;
                                                                     DatabaseReference nftRef=FirebaseDatabase.getInstance().getReference().child("Users").child(userKey).child("Notification").child("NFT"+nftcounter);
+                                                                    DatabaseReference nftmerchantRef=FirebaseDatabase.getInstance().getReference().child("Users").child(merchantkey).child("Notification").child("NFT"+nftcounter);
                                                                     nftRef.child("order_status").setValue("ordered");
                                                                     nftRef.child("nft_timestamp").setValue(ServerValue.TIMESTAMP);
+                                                                    nftRef.child("isViewed").setValue("false");
+                                                                    nftmerchantRef.child("order_status").setValue("ordered");
+                                                                    nftmerchantRef.child("nft_timestamp").setValue(ServerValue.TIMESTAMP);
+                                                                    nftmerchantRef.child("nft_buyer_name").setValue(name);
+                                                                    nftmerchantRef.child("isViewed").setValue("false");
                                                                     nftCounterRef.setValue(nftcounter);
                                                                 }
 

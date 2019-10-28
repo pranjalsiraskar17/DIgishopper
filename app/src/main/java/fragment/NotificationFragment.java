@@ -39,7 +39,7 @@ public class NotificationFragment extends Fragment {
         recyclerView=view.findViewById(R.id.recycler_notification);
         final String user_key= FirebaseAuth.getInstance().getCurrentUser().getUid();
         DatabaseReference dref= FirebaseDatabase.getInstance().getReference().child("Users").child(user_key).child("Notification");
-        dref.addValueEventListener(new ValueEventListener() {
+        dref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
